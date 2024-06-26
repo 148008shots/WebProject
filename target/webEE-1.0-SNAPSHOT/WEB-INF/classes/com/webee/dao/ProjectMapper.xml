@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webee.dao.ProjectMapper">
+    <select id="findById" resultType="com.webee.pojo.Project">
+        select * from projectinf where id = #{id}
+    </select>
+
+    <select id="findAllProjects" resultType="com.webee.pojo.Project">
+        select * from projectinf
+    </select>
+</mapper>
