@@ -17,7 +17,7 @@ public class UserController {
 
     @GetMapping("/login")
     public ModelAndView login() {
-        ModelAndView modelAndView = new ModelAndView("user/login");
+        ModelAndView modelAndView = new ModelAndView("user/login.jsp");
         // 如果需要，添加登录失败的错误消息
         modelAndView.addObject("loginError", "Username or password is incorrect.");
         return modelAndView;
@@ -42,23 +42,40 @@ public class UserController {
             session.setAttribute("USER_SESSION",isValid);
             // 登录成功，重定向到主页
             if(isAdmin){
-                modelAndView.setViewName("admin/Dashboard");
+                modelAndView.setViewName("admin/Dashboard.jsp");
             }
             else if (isUser){
-                modelAndView.setViewName("user/Dashboard");
+                modelAndView.setViewName("user/Dashboard.jsp");
             }
         } else {
             // 登录失败，返回登录页面并显示错误消息
-            modelAndView.setViewName("user/login");
+            modelAndView.setViewName("user/login.jsp");
             modelAndView.addObject("loginError", "用户名或密码错误！");
         }
         return modelAndView;
     }
 
 
-    @ResponseBody
-    @RequestMapping("/demo1")
-    public String demo1(){
-        return "success";
+
+    // 在控制器中返回到注册页面表单
+    @RequestMapping("/goRegister")
+    public String goRegister() {
+        return "user/register.jsp";
+    }
+
+    //接收页面表单提交
+    @RequestMapping("/register")
+    public String register(Users user, HttpServletRequest request) {
+
+        // 这里添加用户注册逻辑，包括邮箱验证
+        boolean isUserSaved = usersService.saveUser(user);
+        if (isUserSaved) {
+            // 注册成功，重定向到登录页面或其他页面
+            return "user/login.jsp";
+        } else {
+            // 注册失败，返回注册页面并显示错误消息
+            request.setAttribute("registerError", "Registration failed. Please try again.");
+            return "user/register.jsp"; // 回到注册页面
+        }
     }
 }

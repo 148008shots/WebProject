@@ -18,5 +18,12 @@ public class UsersServiceImpl implements UsersService {
     public Users findUserByUsernameAndPassword(String name, String password) {
         return usersMapper.findUserByUsernameAndPassword(name,password);
     }
+
+    @Override
+    public boolean saveUser(Users user) {
+        return usersMapper.saveUser(user);
+    }
+
+
 }
 

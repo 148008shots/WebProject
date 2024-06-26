@@ -7,11 +7,13 @@
            http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 
-    <!--视图解析器-->
+<!--
+    &lt;!&ndash;视图解析器&ndash;&gt;
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/"></property>
         <property name="suffix" value=".jsp"></property>
     </bean>
+-->
 
     <!--包扫描-->
     <context:component-scan base-package="com.webee.controller">

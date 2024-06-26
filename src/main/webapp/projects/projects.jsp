@@ -101,9 +101,9 @@
 <div class="sidebar">
     <div class="sidebar-header">申报项目信息管理系统</div>
     <a href="index.jsp">首页&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a>
-    <a href="../jsp/management.jsp">项目管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%--灵活管理项目，可以及时添加和修改项目信息--%>
-    <a href="../jsp/apply.jsp">审核管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%--对申请的项目进行审核，可以进行退回和通过选项，需要添加信息查询功能--%>
-    <a href="../jsp/new.jsp">新闻管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%-- 发布各类新闻信息--%>
+    <a href="../WEB-INF/jsp/management.jsp">项目管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%--灵活管理项目，可以及时添加和修改项目信息--%>
+    <a href="../WEB-INF/jsp/apply.jsp">审核管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%--对申请的项目进行审核，可以进行退回和通过选项，需要添加信息查询功能--%>
+    <a href="../WEB-INF/jsp/new.jsp">新闻管理&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;></a> <%-- 发布各类新闻信息--%>
 </div>
 
 <div class="content">
