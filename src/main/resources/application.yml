@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/gymms?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 112233
+
+    servlet:
+      multipart:
+        location: D:/html/big-event/vue-project-big-event/src/assets/uploadImg/
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  file:
+    upload-path: D:/big-event/uploadFiles
+  mvc:
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: file:D:/html/big-event/vue-project-big-event/src/assets/uploadImg/
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true #开启驼峰命名自动映射
+  type-aliases-package: com.hh.pojo
+
+images:
+  path: D:/html/big-event/vue-project-big-event/src/assets/uploadImg/
+

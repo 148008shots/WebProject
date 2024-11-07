@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hh.mapper.CourtMapper">
+	<select id="selectAllCourts" resultType="Court">
+		SELECT c.*, cat.name AS categoryName
+		FROM courts c
+			     JOIN categories cat ON c.category_id = cat.category_id
+	</select>
+
+	<select id="select1" resultType="Court">
+		SELECT * FROM courts
+		<where>
+			<if test="courtId != null">
+				AND court_id = #{courtId}
+			</if>
+			<if test="courtNumber != null and courtNumber != ''">
+				AND court_number = #{courtNumber}
+			</if>
+		</where>
+	</select>
+</mapper>
