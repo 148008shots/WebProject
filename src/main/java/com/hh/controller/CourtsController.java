@@ -3,9 +3,12 @@ package com.hh.controller;
 import com.hh.pojo.Court;
 import com.hh.pojo.PageBean;
 import com.hh.pojo.Result;
+import com.hh.pojo.TimeSlots;
 import com.hh.service.CourtsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -40,5 +43,17 @@ public class CourtsController {
     public Result deleteCourt(Integer courtId) {
         courtsService.deleteCourt(courtId);
         return Result.success();
+    }
+
+    @GetMapping("/timeSlots")
+    public Result getTimeSlot(){
+       List<TimeSlots> times =courtsService.getAllTimeSlot();
+       return Result.success(times);
+    }
+
+    @GetMapping("/timeSlotsByCourtId")
+    public Result getTimeByCourtId(Integer courtId,String date){
+        List<TimeSlots> times =courtsService.getAllTimeSlotByCourtId(courtId);
+        return Result.success(times);
     }
 }

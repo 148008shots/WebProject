@@ -13,7 +13,7 @@
         </el-card>
 
         <!-- 预约对话框 -->
-        <el-dialog v-model="bookingDialogVisible" title="预约场地">
+        <el-dialog v-model="bookingDialogVisible" title="预约场地" @close="closeBookingDialog">
             <div>
                 <img v-if="selectedVenue.coverImg" :src="selectedVenue.coverImg" alt="封面图片" class="dialog-cover-img" />
                 <div>场地名称: {{ selectedVenue.courtNumber }}</div>
@@ -24,15 +24,30 @@
                     </div>
                 </div>
                 <div class="time-slot-container">
-                    <div class="time-slot-row">
-                        <el-button v-for="time in times" :key="time" :type="isBooked(time) ? 'info' : 'primary'" @click="bookTime(time)" class="time-slot">
-                            {{ time }}
+                    <div style="display: flex; margin: 20px 50px; font-size: 18px; justify-content: space-between">
+                        <div style="display: flex">
+                            <div style="background-color: #c8c9cc; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>不可预约</div>
+                        </div>
+                        <div style="display: flex">
+                            <div style="background-color: #ffa4a4; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>已有预约</div>
+                        </div>
+                        <div style="display: flex">
+                            <div style="background-color: #3ea7f1; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>当前预约</div>
+                        </div>
+                    </div>
+
+                    <div style="margin: 20px 50px; height: 250px" class="button_wrap">
+                        <el-button v-for="(item, index) in times" :key="index" @click="changTime(item, index)" :type="item.status == 0 ? '' : item.status == 1 ? 'danger' : item.status == 2 ? 'info' : 'primary'" :disabled="item.status == 1 || item.status == 2" class="button_style">
+                            {{ formatTime(item.time) }}
                         </el-button>
                     </div>
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="bookingDialogVisible = false">取消</el-button>
+                <el-button @click="closeBookingDialog">取消</el-button>
                 <el-button type="primary" @click="confirmBooking">确认预约</el-button>
             </span>
         </el-dialog>
@@ -52,9 +67,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElCard, ElPagination, ElDialog, ElButton, ElDatePicker } from 'element-plus'
-import { getCourts } from '@/api/court.js'
+import { getCourts, getTimeSlots, getTimeSlotsForVenue } from '@/api/court.js'
 import { nextDay, startOfWeek, addDays, format } from 'date-fns'
 
 // 分页条数据模型
@@ -69,33 +84,111 @@ const selectedVenue = ref({})
 const selectedDate = ref(null)
 const bookedTimes = ref([])
 const visibleDates = ref([])
+// 选择预约时间段模型
+const appointTimeArr = ref([])
 
-const times = ['9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00']
+const times = ref([])
 
-const isBooked = time => {
-    return bookedTimes.value.includes(time)
-}
+//选择预约时间操作
+const changTime = (item, index) => {
+    const maxSelected = 4
 
-const bookTime = time => {
-    if (!isBooked(time)) {
-        bookedTimes.value.push(time)
+    // 如果当前选中的时间段数量已经达到最大值，则不允许继续选择
+    if (appointTimeArr.value.length >= maxSelected) {
+        alert('最多只能选择四个时间段')
+        return
+    }
+
+    // 处理单个时间段的选中和取消选中
+    if (item.status === 0) {
+        // 如果当前时间段未被选中
+        if (appointTimeArr.value.length === 0) {
+            // 第一次选择，直接设置为选中状态
+            times.value[index].status = 3
+            appointTimeArr.value.push(index)
+        } else if (appointTimeArr.value.length === 1) {
+            // 第二次选择，只能是前一个或后一个时间段
+            const firstSelectedIndex = appointTimeArr.value[0]
+            if ((index === firstSelectedIndex - 1 || index === firstSelectedIndex + 1) && times.value[firstSelectedIndex].status === 3) {
+                times.value[index].status = 3
+                appointTimeArr.value.push(index)
+            } else {
+                alert('第二次选择只能是当前时间的前一个或后一个')
+                return
+            }
+        } else {
+            // 已经选择了两个以上的时间段，检查是否连续
+            const sortedIndices = appointTimeArr.value.sort((a, b) => a - b)
+            if ((index === sortedIndices[sortedIndices.length - 1] + 1 || index === sortedIndices[0] - 1) && times.value[sortedIndices[sortedIndices.length - 1]].status === 3) {
+                times.value[index].status = 3
+                appointTimeArr.value.push(index)
+            } else {
+                alert('选择的时间段必须连续')
+                return
+            }
+        }
+    } else if (item.status === 3) {
+        // 如果当前时间段已被选中，取消选中
+        times.value[index].status = 0
+        appointTimeArr.value = appointTimeArr.value.filter(i => i !== index)
     }
 }
 
-const showBookingDialog = venue => {
+//格式化时间显示函数
+const formatTime = time => {
+    const [hours, minutes] = time.split(':').slice(0, 2)
+    return `${hours}:${minutes}`
+}
+//展示预约时间框
+const showBookingDialog = async venue => {
     selectedVenue.value = venue
     selectedDate.value = null // 清空已选日期
     bookedTimes.value = [] // 清空已选时间
     generateVisibleDates() // 生成可见日期
+
+    await fetchTimeSlotsForVenue(venue)
     bookingDialogVisible.value = true
 }
 
 const confirmBooking = () => {
+    // 检查选择的时间段数量是否大于等于最小值
+    const selectedCount = appointTimeArr.value.filter(i => times.value[i].status === 3).length
+    if (selectedCount < 2) {
+        alert('至少需要选择两个时间段')
+        return
+    }
+
+    // 检查时间段是否连续
+    const sortedIndices = appointTimeArr.value.sort((a, b) => a - b)
+    for (let i = 1; i < sortedIndices.length; i++) {
+        if (sortedIndices[i] !== sortedIndices[i - 1] + 1) {
+            alert('选择的时间段必须连续')
+            return
+        }
+    }
+
+    // 获取开始和结束时间段
+    const startIndex = sortedIndices[0]
+    const endIndex = sortedIndices[sortedIndices.length - 1]
+    const startTime = times.value[startIndex].time
+    const endTime = times.value[endIndex].time
+
     // 在这里处理预约逻辑
-    console.log(`预约场地: ${selectedVenue.value.courtNumber}, 日期: ${selectedDate.value}, 时间: ${bookedTimes.value}`)
+    const bookingInfo = {
+        courtId: selectedVenue.value.courtId, // 场地ID
+        courtName: selectedVenue.value.courtNumber, // 场地名称
+        date: selectedDate.value, // 选择的日期
+        startTime: startTime, // 开始时间段
+        endTime: endTime // 结束时间段
+    }
+    console.log('预约信息:', bookingInfo)
+
+    // 这里可以添加发送预约信息到服务器的代码
+    // 例如：sendBookingRequest(bookingInfo).then(response => {...});
+
     bookingDialogVisible.value = false
 }
-
+// 获取场地列表
 const fetchCourts = async () => {
     try {
         let params = {
@@ -115,12 +208,54 @@ const fetchCourts = async () => {
         console.error('Error fetching courts:', error)
     }
 }
-
+// 获取时间段列表
+const fetchTimeSlots = async () => {
+    try {
+        let response = await getTimeSlots()
+        times.value = response.data // 确保 response.data 是您期望的数据格式
+    } catch (error) {
+        console.error('Error fetching time slots:', error)
+    }
+}
+// 获取指定场地的时间段列表
+const fetchTimeSlotsForVenue = async venue => {
+    try {
+        const today = new Date()
+        const formattedDate = formatDate(today)
+        // 假设有一个 API 方法可以根据场地ID获取时间段和预约情况
+        const response = await getTimeSlotsForVenue(venue.courtId, formattedDate)
+        times.value = response.data.map(slot => {
+            return {
+                ...slot,
+                status: slot.status ? 1 : 0, // 假设返回的数据中isBooked字段表示是否已预约
+                time: formatTime(slot.time) // 格式化时间
+            }
+        })
+    } catch (error) {
+        console.error('Error fetching time slots for venue:', error)
+    }
+}
 const onSizeChange = size => {
     pageSize.value = size
     fetchCourts()
 }
-
+// 监听对话框的可见性变化
+const dialogWatch = watch(bookingDialogVisible, newValue => {
+    if (!newValue) {
+        // 当对话框关闭时，清空已选时间段
+        appointTimeArr.value = []
+        times.value.forEach(item => {
+            item.status = item.isBooked ? 1 : 0
+        })
+    }
+})
+// 关闭预约对话框时清空已选时间段和重置状态
+const closeBookingDialog = () => {
+    appointTimeArr.value = []
+    times.value.forEach(item => {
+        item.status = item.isBooked ? 1 : 0
+    })
+}
 const onCurrentChange = num => {
     pageNum.value = num
     fetchCourts()
@@ -134,22 +269,11 @@ const generateVisibleDates = () => {
 const formatDate = date => {
     return format(date, 'yyyy-MM-dd') // 根据需要调整日期格式
 }
-const datePickerOptions = {
-    disabledDate(time) {
-        // 获取今天日期
-        const today = new Date()
-        // 获取后天日期
-        const afterTwoDays = nextDay(new Date())
-        // 获取大后天日期
-        const afterThreeDays = nextDay(afterTwoDays)
-        // 禁用今天之前和大后天之后的日期
-        return time.getTime() < today.getTime() || time.getTime() > afterThreeDays.getTime()
-    }
-    // 你可以根据需要添加其他配置
-}
 onMounted(() => {
     generateVisibleDates() // 初始化可见日期
     fetchCourts()
+    fetchTimeSlots()
+    dialogWatch()
 })
 </script>
 
@@ -161,6 +285,17 @@ onMounted(() => {
     display: inline-block;
     vertical-align: top;
     overflow: hidden; /* 超出部分隐藏 */
+}
+.text-red {
+    color: #fff;
+    background-color: #f56c6c;
+    border-color: #f56c6c;
+}
+
+.text-gray {
+    color: #fff;
+    background-color: #909399;
+    border-color: #909399;
 }
 
 .card-content {
@@ -179,13 +314,18 @@ onMounted(() => {
     margin: 5px;
 }
 
+.button_style {
+    text-align: center;
+    float: left;
+    width: 80px;
+}
+
 .time-slot-container {
     display: flex;
     flex-wrap: wrap; /* 允许内容换行 */
     justify-content: space-between; /* 从行的开始位置对齐项目 */
 }
 
-/* 时间段按钮的样式 */
 .time-slot {
     flex: 0 0 16.666%; /* 每个时间按钮占据16.666%的宽度，即每行六个 */
     margin: 5px; /* 给时间按钮添加外边距 */
@@ -196,21 +336,32 @@ onMounted(() => {
     transition: background-color 0.3s; /* 添加背景色变化的过渡效果 */
 }
 
-.time-slot:hover {
-    background-color: #f5f5f5; /* 鼠标悬停时的背景色 */
+/* 禁用状态下的样式 */
+.time-slot.status-1 {
+    background-color: #f56c6c !important; /* 红色 */
+    border-color: #f56c6c !important;
+    color: #fff !important;
+    cursor: not-allowed;
 }
 
-.time-slot.is-booked {
-    background-color: #409eff; /* 已预约时间段的背景色 */
-    color: white;
-    cursor: not-allowed; /* 已预约时间段的光标样式 */
+.time-slot.status-2 {
+    background-color: #909399 !important; /* 深灰色 */
+    border-color: #909399 !important;
+    color: #fff !important;
+    cursor: not-allowed;
 }
 
-.time-slot.is-current {
-    background-color: #67c23a; /* 当前选择时间段的背景色 */
-    color: white;
+/* 非禁用状态下的样式 */
+.time-slot.status-0 {
+    background-color: #409eff !important; /* 蓝色 */
+    border-color: #409eff !important;
+    color: #fff !important;
 }
-
+.time-slot.selected {
+    background-color: #2fd32f !important; /* 粉红色 */
+    border-color: #2fd32f !important;
+    color: #fff !important;
+}
 .dialog-footer {
     text-align: right;
     margin-top: 20px;

@@ -2,6 +2,7 @@ package com.hh.service;
 
 import com.hh.pojo.Court;
 import com.hh.pojo.PageBean;
+import com.hh.pojo.TimeSlots;
 
 import java.util.List;
 
@@ -13,4 +14,7 @@ public interface CourtsService {
     int deleteCourt(Integer courtId);
 
     PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer courtId, String courtNumber);
+
+    List<TimeSlots> getAllTimeSlot();
+    List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId);
 }

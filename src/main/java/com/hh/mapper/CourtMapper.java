@@ -1,6 +1,8 @@
 package com.hh.mapper;
 
+import com.hh.pojo.Bookings;
 import com.hh.pojo.Court;
+import com.hh.pojo.TimeSlots;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -18,4 +20,10 @@ public interface CourtMapper {
 
     @Delete("DELETE FROM courts WHERE court_id = #{courtId}")
     int deleteCourt(@Param("courtId") int courtId);
+
+    @Select("select * from time_slots")
+    List<TimeSlots> selectTimeSlot();
+    @Select("select * from bookings where court_id = #{courtId}")
+    List<Bookings> selectBookingByCourtId(@Param("courtId") int courtId);
+
 }

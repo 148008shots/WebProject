@@ -21,3 +21,11 @@ export const updateCourt = court => {
 export const deleteCourt = courtId => {
     return request.delete('/court?courtId=' + courtId)
 }
+// 获取时间段
+export const getTimeSlots = () => {
+    return request.get('/court/timeSlots')
+}
+
+export const getTimeSlotsForVenue = (courtId, date) => {
+    return request.get('/court/timeSlotsByCourtId', { params: { courtId, date } })
+}

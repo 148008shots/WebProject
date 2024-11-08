@@ -3,12 +3,17 @@ package com.hh.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.hh.mapper.CourtMapper;
+import com.hh.pojo.Bookings;
 import com.hh.pojo.Court;
 import com.hh.pojo.PageBean;
+import com.hh.pojo.TimeSlots;
 import com.hh.service.CourtsService;
+import com.hh.utils.TimeForUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -48,4 +53,43 @@ public class CourtsServiceImpl implements CourtsService {
         pb.setTotal(p.getTotal());
         return pb;
     }
+
+    @Override
+    public List<TimeSlots> getAllTimeSlot() {
+        return courtMapper.selectTimeSlot();
+    }
+
+    public List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId) {
+        // 1. 查询所有时间段
+        List<TimeSlots> allTimeSlots = getAllTimeSlot();
+
+        // 2. 根据场地Id查询预约信息
+        List<Bookings> bookings = courtMapper.selectBookingByCourtId(courtId);
+
+        // 3. 遍历时间段和预约信息，更新时间段状态
+        for (TimeSlots timeSlot : allTimeSlots) {
+            for (Bookings booking : bookings) {
+                if (isTimeOverlap(timeSlot.getTime(), booking.getStartTime(), booking.getEndTime())) {
+                    timeSlot.setStatus(1);
+                    break; // 如果已经找到重叠，就不需要继续检查其他预约
+                }
+            }
+        }
+
+        // 4. 将设置好的时间段返回到控制层去
+        return allTimeSlots;
+    }
+
+    private boolean isTimeOverlap(String timeSlotTime, String startTime, String endTime) {
+        // 将字符串时间转换为LocalTime对象
+        LocalTime timeSlotLocalTime = TimeForUtil.parseTime(timeSlotTime);
+        LocalTime startLocalTime = TimeForUtil.parseTime(startTime);
+        LocalTime endLocalTime = TimeForUtil.parseTime(endTime);
+
+        // 检查时间段是否在预约时间内
+        return !timeSlotLocalTime.isBefore(startLocalTime) && !timeSlotLocalTime.isAfter(endLocalTime);
+    }
+
+
+
 }

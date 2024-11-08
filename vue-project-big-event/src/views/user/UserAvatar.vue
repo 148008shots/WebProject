@@ -57,7 +57,7 @@ const updateAvatar = async () => {
 
 <style lang="scss" scoped>
 .avatar-uploader {
-    :deep() {
+    :deep {
         .avatar {
             width: 278px;
             height: 278px;
