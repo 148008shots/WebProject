@@ -1,5 +1,6 @@
 package com.hh.service;
 
+import com.hh.pojo.Bookings;
 import com.hh.pojo.Court;
 import com.hh.pojo.PageBean;
 import com.hh.pojo.TimeSlots;
@@ -16,5 +17,7 @@ public interface CourtsService {
     PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer courtId, String courtNumber);
 
     List<TimeSlots> getAllTimeSlot();
-    List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId);
+    List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId,String date);
+
+    void createBooking(Bookings booking);
 }

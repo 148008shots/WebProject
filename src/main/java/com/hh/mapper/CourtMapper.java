@@ -26,4 +26,11 @@ public interface CourtMapper {
     @Select("select * from bookings where court_id = #{courtId}")
     List<Bookings> selectBookingByCourtId(@Param("courtId") int courtId);
 
+    @Select("SELECT * FROM bookings WHERE court_id=#{courtId} AND day_of_year=#{year} AND day_of_month=#{month} AND day=#{day}")
+    List<Bookings> selectBookingsByCourtIdAndDate(@Param("courtId") int courtId, @Param("year") int year, @Param("month") int month, @Param("day") int day);
+
+    @Insert("INSERT INTO bookings (user_id, court_id, start_time, end_time, day_of_year, day_of_month, day, created_at) VALUES " +
+            "(#{userId}, #{courtId}, #{startTime}, #{endTime}, #{dayOfYear}, #{dayOfMonth}, #{day}, #{createdAt})")
+    void insertBooking(Bookings booking);
 }
+

@@ -19,8 +19,8 @@
                 <div>场地名称: {{ selectedVenue.courtNumber }}</div>
                 <!-- 显示当前日期和往后两天的日期按钮 -->
                 <div class="date-container">
-                    <div v-for="date in visibleDates" :key="date" class="date-button" @click="selectDate(date)">
-                        {{ formatDate(date) }}
+                    <div v-for="dateObj in visibleDates" :key="dateObj.date" class="date-button" :class="{ selected: dateObj.status === 'selected' }" @click="selectDate(dateObj)">
+                        {{ dateObj.label }}
                     </div>
                 </div>
                 <div class="time-slot-container">
@@ -68,9 +68,11 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { ElCard, ElPagination, ElDialog, ElButton, ElDatePicker } from 'element-plus'
-import { getCourts, getTimeSlots, getTimeSlotsForVenue } from '@/api/court.js'
-import { nextDay, startOfWeek, addDays, format } from 'date-fns'
+import { ElCard, ElPagination, ElDialog, ElButton, ElDatePicker, ElMessage } from 'element-plus'
+import { getCourts, getTimeSlots, getTimeSlotsForVenue, creatBooking } from '@/api/court.js'
+import { addDays, format } from 'date-fns'
+import { zhCN } from 'date-fns/locale' // 导入中文语言包
+import useUserInfoStore from '@/stores/userInfo'
 
 // 分页条数据模型
 const pageNum = ref(1)
@@ -82,20 +84,50 @@ const venues = ref([])
 const bookingDialogVisible = ref(false)
 const selectedVenue = ref({})
 const selectedDate = ref(null)
-const bookedTimes = ref([])
 const visibleDates = ref([])
 // 选择预约时间段模型
 const appointTimeArr = ref([])
 
 const times = ref([])
 
-//选择预约时间操作
+//格式化时间显示函数
+const formatTime = time => {
+    const [hours, minutes] = time.split(':').slice(0, 2)
+    return `${hours}:${minutes}`
+}
+// 初始化可见日期
+const generateVisibleDates = () => {
+    const today = new Date()
+    visibleDates.value = [
+        { date: format(today, 'yyyy-MM-dd', { locale: zhCN }), label: format(today, 'yyyy年MM月dd日 EEEE', { locale: zhCN }), status: '' },
+        { date: format(addDays(today, 1), 'yyyy-MM-dd', { locale: zhCN }), label: format(addDays(today, 1), 'yyyy年MM月dd日 EEEE', { locale: zhCN }), status: '' },
+        { date: format(addDays(today, 2), 'yyyy-MM-dd', { locale: zhCN }), label: format(addDays(today, 2), 'yyyy年MM月dd日 EEEE', { locale: zhCN }), status: '' }
+    ]
+}
+// 选择日期
+const selectDate = dateObj => {
+    appointTimeArr.value = []
+    // 重置所有日期的状态
+    visibleDates.value.forEach(date => (date.status = ''))
+    // 设置选中的日期状态
+    dateObj.status = 'selected'
+    selectedDate.value = dateObj.date
+    fetchTimeSlotsForVenue(selectedVenue.value, selectedDate.value) // 查询对应日期的预约情况
+}
+//展示预约时间框
+const showBookingDialog = async venue => {
+    selectedVenue.value = venue
+    selectedDate.value = format(new Date(), 'yyyy-MM-dd') // 默认选择当天日期
+    await fetchTimeSlotsForVenue(venue, selectedDate.value) // 获取当天的预约时间段情况
+    bookingDialogVisible.value = true
+}
+// 选择预约时间操作
 const changTime = (item, index) => {
     const maxSelected = 4
 
     // 如果当前选中的时间段数量已经达到最大值，则不允许继续选择
     if (appointTimeArr.value.length >= maxSelected) {
-        alert('最多只能选择四个时间段')
+        ElMessage.warning('最多只能选择四个时间段')
         return
     }
 
@@ -113,7 +145,7 @@ const changTime = (item, index) => {
                 times.value[index].status = 3
                 appointTimeArr.value.push(index)
             } else {
-                alert('第二次选择只能是当前时间的前一个或后一个')
+                ElMessage.warning('第二次选择只能是当前时间的前一个或后一个')
                 return
             }
         } else {
@@ -123,7 +155,7 @@ const changTime = (item, index) => {
                 times.value[index].status = 3
                 appointTimeArr.value.push(index)
             } else {
-                alert('选择的时间段必须连续')
+                ElMessage.warning('选择的时间段必须连续')
                 return
             }
         }
@@ -133,28 +165,12 @@ const changTime = (item, index) => {
         appointTimeArr.value = appointTimeArr.value.filter(i => i !== index)
     }
 }
-
-//格式化时间显示函数
-const formatTime = time => {
-    const [hours, minutes] = time.split(':').slice(0, 2)
-    return `${hours}:${minutes}`
-}
-//展示预约时间框
-const showBookingDialog = async venue => {
-    selectedVenue.value = venue
-    selectedDate.value = null // 清空已选日期
-    bookedTimes.value = [] // 清空已选时间
-    generateVisibleDates() // 生成可见日期
-
-    await fetchTimeSlotsForVenue(venue)
-    bookingDialogVisible.value = true
-}
-
+// 确认预约按钮
 const confirmBooking = () => {
     // 检查选择的时间段数量是否大于等于最小值
     const selectedCount = appointTimeArr.value.filter(i => times.value[i].status === 3).length
     if (selectedCount < 2) {
-        alert('至少需要选择两个时间段')
+        ElMessage.warning('至少需要选择两个时间段')
         return
     }
 
@@ -162,7 +178,7 @@ const confirmBooking = () => {
     const sortedIndices = appointTimeArr.value.sort((a, b) => a - b)
     for (let i = 1; i < sortedIndices.length; i++) {
         if (sortedIndices[i] !== sortedIndices[i - 1] + 1) {
-            alert('选择的时间段必须连续')
+            ElMessage.warning('选择的时间段必须连续')
             return
         }
     }
@@ -173,9 +189,12 @@ const confirmBooking = () => {
     const startTime = times.value[startIndex].time
     const endTime = times.value[endIndex].time
 
+    const userInfoStore = useUserInfoStore()
+
     // 在这里处理预约逻辑
     const bookingInfo = {
         courtId: selectedVenue.value.courtId, // 场地ID
+        userId: userInfoStore.info.id,
         courtName: selectedVenue.value.courtNumber, // 场地名称
         date: selectedDate.value, // 选择的日期
         startTime: startTime, // 开始时间段
@@ -183,9 +202,23 @@ const confirmBooking = () => {
     }
     console.log('预约信息:', bookingInfo)
 
-    // 这里可以添加发送预约信息到服务器的代码
-    // 例如：sendBookingRequest(bookingInfo).then(response => {...});
+    creatBooking(bookingInfo)
+        .then(response => {
+            // 检查后端返回的code值来判断操作是否成功
+            if (response.code === 0) {
+                ElMessage.success('预约成功')
+            } else {
+                // 如果后端返回的code值不为0，提示预约失败
+                ElMessage.error('预约失败: ' + response.message)
+            }
+        })
+        .catch(error => {
+            // 网络请求失败或其他错误，提示预约失败
+            console.error('预约请求失败:', error)
+            ElMessage.error('预约失败')
+        })
 
+    // 关闭对话框
     bookingDialogVisible.value = false
 }
 // 获取场地列表
@@ -196,6 +229,7 @@ const fetchCourts = async () => {
             pageSize: pageSize.value
         }
         const response = await getCourts(params)
+
         venues.value = response.data.items.map(item => ({
             courtId: item.courtId,
             courtNumber: item.courtNumber,
@@ -218,12 +252,9 @@ const fetchTimeSlots = async () => {
     }
 }
 // 获取指定场地的时间段列表
-const fetchTimeSlotsForVenue = async venue => {
+const fetchTimeSlotsForVenue = async (venue, date) => {
     try {
-        const today = new Date()
-        const formattedDate = formatDate(today)
-        // 假设有一个 API 方法可以根据场地ID获取时间段和预约情况
-        const response = await getTimeSlotsForVenue(venue.courtId, formattedDate)
+        const response = await getTimeSlotsForVenue(venue.courtId, date)
         times.value = response.data.map(slot => {
             return {
                 ...slot,
@@ -235,6 +266,7 @@ const fetchTimeSlotsForVenue = async venue => {
         console.error('Error fetching time slots for venue:', error)
     }
 }
+// 页码变化
 const onSizeChange = size => {
     pageSize.value = size
     fetchCourts()
@@ -255,19 +287,13 @@ const closeBookingDialog = () => {
     times.value.forEach(item => {
         item.status = item.isBooked ? 1 : 0
     })
+    // 关闭对话框
+    bookingDialogVisible.value = false
 }
+//页码发生变化
 const onCurrentChange = num => {
     pageNum.value = num
     fetchCourts()
-}
-
-const generateVisibleDates = () => {
-    const today = new Date()
-    visibleDates.value = [today, addDays(today, 1), addDays(today, 2)]
-}
-// 定义 formatDate 函数
-const formatDate = date => {
-    return format(date, 'yyyy-MM-dd') // 根据需要调整日期格式
 }
 onMounted(() => {
     generateVisibleDates() // 初始化可见日期
@@ -385,9 +411,13 @@ onMounted(() => {
 }
 
 .date-button:hover {
-    background-color: #f5f5f5;
+    background-color: #b0e5e7;
 }
-
+/* 被选中的日期按钮样式 */
+.selected {
+    background-color: #3ea7f1; /* 被选中时的背景颜色 */
+    color: #fff; /* 被选中时的文字颜色 */
+}
 /* 预约对话框中的封面图片样式 */
 .dialog-cover-img {
     width: 600px; /* 固定宽度 */

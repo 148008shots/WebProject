@@ -1,9 +1,6 @@
 package com.hh.controller;
 
-import com.hh.pojo.Court;
-import com.hh.pojo.PageBean;
-import com.hh.pojo.Result;
-import com.hh.pojo.TimeSlots;
+import com.hh.pojo.*;
 import com.hh.service.CourtsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +50,14 @@ public class CourtsController {
 
     @GetMapping("/timeSlotsByCourtId")
     public Result getTimeByCourtId(Integer courtId,String date){
-        List<TimeSlots> times =courtsService.getAllTimeSlotByCourtId(courtId);
+        List<TimeSlots> times =courtsService.getAllTimeSlotByCourtId(courtId,date);
         return Result.success(times);
+    }
+
+    @PostMapping("/createBooking")
+    public Result createBooking(@RequestBody Bookings booking) {
+        System.out.println(booking);
+        courtsService.createBooking(booking);
+        return Result.success();
     }
 }

@@ -29,3 +29,7 @@ export const getTimeSlots = () => {
 export const getTimeSlotsForVenue = (courtId, date) => {
     return request.get('/court/timeSlotsByCourtId', { params: { courtId, date } })
 }
+
+export const creatBooking = bookingInfo => {
+    return request.post('/court/createBooking', bookingInfo)
+}

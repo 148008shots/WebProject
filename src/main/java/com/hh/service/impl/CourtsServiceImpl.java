@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -59,27 +60,26 @@ public class CourtsServiceImpl implements CourtsService {
         return courtMapper.selectTimeSlot();
     }
 
-    public List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId) {
+    @Override
+    public List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId, String date) {
         // 1. 查询所有时间段
         List<TimeSlots> allTimeSlots = getAllTimeSlot();
-
-        // 2. 根据场地Id查询预约信息
-        List<Bookings> bookings = courtMapper.selectBookingByCourtId(courtId);
-
+        // 格式化日期
+        int[] dateParts = TimeForUtil.parseDate1(date);
+        // 2. 根据场地Id查询和日期预约信息
+        List<Bookings> bos = courtMapper.selectBookingsByCourtIdAndDate(courtId, dateParts[0], dateParts[1], dateParts[2]);
         // 3. 遍历时间段和预约信息，更新时间段状态
         for (TimeSlots timeSlot : allTimeSlots) {
-            for (Bookings booking : bookings) {
+            for (Bookings booking : bos) {
                 if (isTimeOverlap(timeSlot.getTime(), booking.getStartTime(), booking.getEndTime())) {
                     timeSlot.setStatus(1);
                     break; // 如果已经找到重叠，就不需要继续检查其他预约
                 }
             }
         }
-
         // 4. 将设置好的时间段返回到控制层去
         return allTimeSlots;
     }
-
     private boolean isTimeOverlap(String timeSlotTime, String startTime, String endTime) {
         // 将字符串时间转换为LocalTime对象
         LocalTime timeSlotLocalTime = TimeForUtil.parseTime(timeSlotTime);
@@ -90,6 +90,16 @@ public class CourtsServiceImpl implements CourtsService {
         return !timeSlotLocalTime.isBefore(startLocalTime) && !timeSlotLocalTime.isAfter(endLocalTime);
     }
 
+
+    public void createBooking(Bookings booking) {
+        int[] dateParts = TimeForUtil.parseDate1(booking.getDate());
+        booking.setDayOfYear(dateParts[0]);
+        booking.setDayOfMonth(dateParts[1]);
+        booking.setDay(dateParts[2]);
+        booking.setCreatedAt(LocalDateTime.now());
+        System.out.println(booking);
+        courtMapper.insertBooking(booking);
+    }
 
 
 }

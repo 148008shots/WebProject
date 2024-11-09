@@ -15,4 +15,5 @@ public class Bookings {
     private Integer dayOfYear;
     private Integer dayOfMonth;
     private Integer day;
+    private String date;
 }
