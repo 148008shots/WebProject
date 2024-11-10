@@ -3,7 +3,6 @@
         <h2>器材管理</h2>
         <!-- 添加器材按钮 -->
         <el-button type="primary" @click="dialogVisible = true">添加器材</el-button>
-
         <!-- 器材列表 -->
         <el-table :data="equipments" style="width: 100%; margin-top: 20px">
             <el-table-column prop="equipmentId" label="器材ID" width="100"></el-table-column>
@@ -22,22 +21,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <!-- 添加借用信息按钮 -->
-        <el-button type="primary" @click="borrowDialogVisible = true">借用器材</el-button>
-        <!-- 器材借用管理表 -->
-        <el-table :data="borrowings" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="borrowingId" label="借用ID" width="100"></el-table-column>
-            <el-table-column prop="equipmentId" label="器材ID" width="100"></el-table-column>
-            <el-table-column prop="userId" label="用户ID" width="100"></el-table-column>
-            <el-table-column prop="borrowTime" label="借用时间" width="180"></el-table-column>
-            <el-table-column prop="returnTime" label="归还时间" width="180"></el-table-column>
-            <el-table-column label="操作" width="150">
-                <template #default="scope">
-                    <el-button @click="editBorrowing(scope.row)">编辑</el-button>
-                    <el-button type="danger" @click="deleteBorrowing1(scope.row)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+
         <!-- 添加/编辑器材表单 -->
         <el-dialog :title="isEditing ? '编辑器材' : '添加器材'" v-model="dialogVisible" width="30%">
             <el-form :model="currentEquipment">
@@ -62,27 +46,6 @@
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveEquipment">确定</el-button>
-            </span>
-        </el-dialog>
-        <!-- 添加/编辑借用信息表单 -->
-        <el-dialog :title="isEditing ? '编辑借用信息' : '添加借用信息'" v-model="borrowDialogVisible" width="30%">
-            <el-form :model="currentBorrowing">
-                <el-form-item label="器材ID">
-                    <el-input v-model="currentBorrowing.equipmentId" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="用户ID">
-                    <el-input v-model="currentBorrowing.userId" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="借用时间">
-                    <el-date-picker v-model="currentBorrowing.borrowTime" type="date" placeholder="选择日期"></el-date-picker>
-                </el-form-item>
-                <el-form-item label="归还时间">
-                    <el-date-picker v-model="currentBorrowing.returnTime" type="date" placeholder="选择日期"></el-date-picker>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="borrowDialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="saveBorrowing">确定</el-button>
             </span>
         </el-dialog>
     </div>

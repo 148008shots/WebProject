@@ -39,4 +39,23 @@ public interface EquipmentMapper {
     // 查询全部预定信息
     @Select("SELECT * FROM `equipmentborrowings`")
     List<EquipmentBorrowing> getAllBorrowings();
+
+    @Select("SELECT " +
+            "eb.borrowing_id AS borrowingId, " +
+            "eb.equipment_id AS equipmentId, " +
+            "e.cover_img AS coverImg, " +
+            "e.name AS EquipmentName, " +
+            "eb.user_id AS userId, " +
+            "u.username AS username, " +
+            "eb.borrow_quantity AS borrowQuantity, " +
+            "eb.borrow_time AS borrowTime, " +
+            "eb.return_time AS returnTime, " +
+            "eb.borrow_status AS borrowStatus " +
+            "FROM equipmentborrowings eb " +
+            "JOIN user u ON eb.user_id = u.id " +
+            "JOIN equipment e ON eb.equipment_id = e.equipment_id")
+    List<EquipmentBorrowing> findAllWithUserInfoAndEquipmentInfo();
+
+    @Update("UPDATE equipmentborrowings SET borrow_status = #{newStatus} WHERE borrowing_id = #{borrowingId}")
+    int updateBorrowStatus(@Param("borrowingId") int borrowingId, @Param("newStatus") int newStatus);
 }

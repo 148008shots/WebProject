@@ -46,7 +46,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public List<EquipmentBorrowing> getAllEquipmentBorrowings() {
-        return equipmentMapper.getAllBorrowings();
+        return equipmentMapper.findAllWithUserInfoAndEquipmentInfo();
     }
 
     @Override
@@ -62,5 +62,12 @@ public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public boolean updateEquipmentBorrowing(EquipmentBorrowing borrowing) {
         return equipmentMapper.updateBorrowing(borrowing) > 0;
+    }
+
+    @Override
+    public boolean updateBorrowingStatus(Integer borrowingId, Integer newStatus) {
+
+        int result = equipmentMapper.updateBorrowStatus(borrowingId, newStatus);
+        return result > 0;
     }
 }

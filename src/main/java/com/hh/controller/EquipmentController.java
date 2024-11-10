@@ -59,4 +59,12 @@ public class EquipmentController {
         return result ? Result.success("更新成功") : Result.error("更新失败");
     }
 
+    @PutMapping("/updateBorrowing1")
+    public Result updateBorrowingStatus(
+            @RequestParam Integer borrowingId,
+            @RequestParam String newStatus
+    ) {
+        boolean result = equipmentService.updateBorrowingStatus(borrowingId, Integer.valueOf(newStatus));
+        return result ? Result.success("更新成功") : Result.error("更新失败");
+    }
 }

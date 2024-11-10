@@ -21,6 +21,7 @@ import ManageClub from '@/views/admin/ManageClub.vue'
 import ManageCourt from '@/views/admin/ManageCourt.vue'
 import ManageActivity from '@/views/admin/ManageActivity.vue'
 import ManageEquipment from '@/views/admin/ManageEquipment.vue'
+import ManageEquipmentBorrowing from '@/views/admin/ManageEquipmentBorrowing.vue'
 import Auth from '@/views/Auth.vue'
 import adminindex from '@/views/admin.vue'
 import userHome from '@/views/userHome.vue'
@@ -73,6 +74,11 @@ const routes = [
                 path: '/ManageEquipment',
                 component: ManageEquipment,
                 name: 'ManageEquipment' // 添加路由名称
+            },
+            {
+                path: '/ManageEquipmentBorrowing',
+                component: ManageEquipmentBorrowing,
+                name: 'ManageEquipmentBorrowing' // 添加路由名称
             },
             {
                 path: '/admins/avatar',
