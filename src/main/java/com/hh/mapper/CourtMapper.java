@@ -11,7 +11,7 @@ import java.util.List;
 public interface CourtMapper {
     List<Court> selectAllCourts();
 
-    List<Court> select1(Integer courtId,String courtNumber);
+    List<Court> select1(Integer categoryId,String courtNumber);
     @Insert("INSERT INTO courts (category_id, location, court_number, cover_img) VALUES (#{categoryId}, #{location}, #{courtNumber}, #{coverImg})")
     void insertCourt( Court court);
 

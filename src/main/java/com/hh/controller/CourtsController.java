@@ -18,11 +18,13 @@ public class CourtsController {
     public Result<PageBean<Court>>  listCourts(
             Integer pageNum,
             Integer pageSize,
-            @RequestParam(required = false) Integer courtId,
-            @RequestParam(required = false) String courtNumber
+            @RequestParam(required = false) Integer categoryId,//分类id
+            @RequestParam(required = false) String courtName // 场地名称
     ) {
+        System.out.println(categoryId);
+        System.out.println(courtName);
         // 调用服务层方法获取球场信息列表
-        PageBean<Court> pageBean= courtsService.list1(pageNum,pageSize,courtId,courtNumber);
+        PageBean<Court> pageBean= courtsService.list1(pageNum,pageSize,categoryId,courtName);
         return Result.success(pageBean);
     }
     @PostMapping

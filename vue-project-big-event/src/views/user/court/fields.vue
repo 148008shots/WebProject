@@ -1,75 +1,7 @@
-<template>
-    <div>
-        <!-- 场地列表 -->
-        <el-card v-for="venue in venues" :key="venue.courtId" class="card-item" shadow="hover">
-            <div class="card-content">
-                <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="cover-img" />
-                <span v-else>无图片</span>
-                <div>场地编号: {{ venue.courtId }}</div>
-                <div>场地名称: {{ venue.courtNumber }}</div>
-                <div>位置: {{ venue.location }}</div>
-                <el-button type="primary" @click="showBookingDialog(venue)">预约</el-button>
-            </div>
-        </el-card>
-
-        <!-- 预约对话框 -->
-        <el-dialog v-model="bookingDialogVisible" title="预约场地" @close="closeBookingDialog">
-            <div>
-                <img v-if="selectedVenue.coverImg" :src="selectedVenue.coverImg" alt="封面图片" class="dialog-cover-img" />
-                <div>场地名称: {{ selectedVenue.courtNumber }}</div>
-                <!-- 显示当前日期和往后两天的日期按钮 -->
-                <div class="date-container">
-                    <div v-for="dateObj in visibleDates" :key="dateObj.date" class="date-button" :class="{ selected: dateObj.status === 'selected' }" @click="selectDate(dateObj)">
-                        {{ dateObj.label }}
-                    </div>
-                </div>
-                <div class="time-slot-container">
-                    <div style="display: flex; margin: 20px 50px; font-size: 18px; justify-content: space-between">
-                        <div style="display: flex">
-                            <div style="background-color: #c8c9cc; width: 40px; height: 20px; margin-right: 10px"></div>
-                            <div>不可预约</div>
-                        </div>
-                        <div style="display: flex">
-                            <div style="background-color: #ffa4a4; width: 40px; height: 20px; margin-right: 10px"></div>
-                            <div>已有预约</div>
-                        </div>
-                        <div style="display: flex">
-                            <div style="background-color: #3ea7f1; width: 40px; height: 20px; margin-right: 10px"></div>
-                            <div>当前预约</div>
-                        </div>
-                    </div>
-
-                    <div style="margin: 20px 50px; height: 250px" class="button_wrap">
-                        <el-button v-for="(item, index) in times" :key="index" @click="changTime(item, index)" :type="item.status == 0 ? '' : item.status == 1 ? 'danger' : item.status == 2 ? 'info' : 'primary'" :disabled="item.status == 1 || item.status == 2" class="button_style">
-                            {{ formatTime(item.time) }}
-                        </el-button>
-                    </div>
-                </div>
-            </div>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="closeBookingDialog">取消</el-button>
-                <el-button type="primary" @click="confirmBooking">确认预约</el-button>
-            </span>
-        </el-dialog>
-
-        <!-- 分页条 -->
-        <el-pagination
-            v-model:current-page="pageNum"
-            v-model:page-size="pageSize"
-            :page-sizes="[3, 5, 10, 15]"
-            layout="jumper, total, sizes, prev, pager, next"
-            background
-            :total="total"
-            @size-change="onSizeChange"
-            @current-change="onCurrentChange"
-            style="margin-top: 20px; justify-content: flex-end" />
-    </div>
-</template>
-
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { ElCard, ElPagination, ElDialog, ElButton, ElDatePicker, ElMessage } from 'element-plus'
-import { getCourts, getTimeSlots, getTimeSlotsForVenue, creatBooking } from '@/api/court.js'
+import { getCourts, getTimeSlots, getTimeSlotsForVenue, creatBooking, getAllCategories } from '@/api/court.js'
 import { addDays, format } from 'date-fns'
 import { zhCN } from 'date-fns/locale' // 导入中文语言包
 import useUserInfoStore from '@/stores/userInfo'
@@ -79,6 +11,13 @@ const pageNum = ref(1)
 const total = ref(20)
 const pageSize = ref(8)
 const venues = ref([])
+
+//用户搜索时选中的分类id
+const categoryId = ref('')
+
+//用户搜索时选中的发布状态
+const courtName = ref('')
+const courtCategory = ref('')
 
 // 预约对话框相关数据
 const bookingDialogVisible = ref(false)
@@ -226,7 +165,9 @@ const fetchCourts = async () => {
     try {
         let params = {
             pageNum: pageNum.value,
-            pageSize: pageSize.value
+            pageSize: pageSize.value,
+            categoryId: categoryId.value ? categoryId.value : null,
+            courtName: courtName.value ? courtName.value : null
         }
         const response = await getCourts(params)
 
@@ -241,6 +182,11 @@ const fetchCourts = async () => {
     } catch (error) {
         console.error('Error fetching courts:', error)
     }
+}
+// 获取场地分类
+const fetchCategories = async () => {
+    let result = await getAllCategories()
+    courtCategory.value = result.data
 }
 // 获取时间段列表
 const fetchTimeSlots = async () => {
@@ -300,8 +246,90 @@ onMounted(() => {
     fetchCourts()
     fetchTimeSlots()
     dialogWatch()
+    fetchCategories()
 })
 </script>
+
+<template>
+    <div>
+        <!-- 搜索场地表单-->
+        <el-form inline>
+            <el-form-item label="场地分类">
+                <el-select placeholder="请选择" v-model="categoryId" style="width: 240px">
+                    <el-option v-for="c in courtCategory" :key="c.categoryId" :label="c.name" :value="c.categoryId"> </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="球场名称" style="width: 240px"> <el-input v-model="courtName" placeholder="请输入球场名称"></el-input> </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="fetchCourts">搜索</el-button>
+                <el-button @click=";(categoryId = ''), (courtName = '')">重置</el-button>
+            </el-form-item>
+        </el-form>
+        <!-- 场地列表 -->
+        <el-card v-for="venue in venues" :key="venue.courtId" class="card-item" shadow="hover">
+            <div class="card-content">
+                <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="cover-img" />
+                <span v-else>无图片</span>
+                <div>场地编号: {{ venue.courtId }}</div>
+                <div>场地名称: {{ venue.courtNumber }}</div>
+                <div>位置: {{ venue.location }}</div>
+                <el-button type="primary" @click="showBookingDialog(venue)">预约</el-button>
+            </div>
+        </el-card>
+
+        <!-- 预约对话框 -->
+        <el-dialog v-model="bookingDialogVisible" title="预约场地" @close="closeBookingDialog">
+            <div>
+                <img v-if="selectedVenue.coverImg" :src="selectedVenue.coverImg" alt="封面图片" class="dialog-cover-img" />
+                <div>场地名称: {{ selectedVenue.courtNumber }}</div>
+                <!-- 显示当前日期和往后两天的日期按钮 -->
+                <div class="date-container">
+                    <div v-for="dateObj in visibleDates" :key="dateObj.date" class="date-button" :class="{ selected: dateObj.status === 'selected' }" @click="selectDate(dateObj)">
+                        {{ dateObj.label }}
+                    </div>
+                </div>
+                <div class="time-slot-container">
+                    <div style="display: flex; margin: 20px 50px; font-size: 18px; justify-content: space-between">
+                        <div style="display: flex">
+                            <div style="background-color: #c8c9cc; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>不可预约</div>
+                        </div>
+                        <div style="display: flex">
+                            <div style="background-color: #ffa4a4; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>已有预约</div>
+                        </div>
+                        <div style="display: flex">
+                            <div style="background-color: #3ea7f1; width: 40px; height: 20px; margin-right: 10px"></div>
+                            <div>当前预约</div>
+                        </div>
+                    </div>
+
+                    <div style="margin: 20px 50px; height: 250px" class="button_wrap">
+                        <el-button v-for="(item, index) in times" :key="index" @click="changTime(item, index)" :type="item.status == 0 ? '' : item.status == 1 ? 'danger' : item.status == 2 ? 'info' : 'primary'" :disabled="item.status == 1 || item.status == 2" class="button_style">
+                            {{ formatTime(item.time) }}
+                        </el-button>
+                    </div>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="closeBookingDialog">取消</el-button>
+                <el-button type="primary" @click="confirmBooking">确认预约</el-button>
+            </span>
+        </el-dialog>
+
+        <!-- 分页条 -->
+        <el-pagination
+            v-model:current-page="pageNum"
+            v-model:page-size="pageSize"
+            :page-sizes="[3, 5, 10, 15]"
+            layout="jumper, total, sizes, prev, pager, next"
+            background
+            :total="total"
+            @size-change="onSizeChange"
+            @current-change="onCurrentChange"
+            style="margin-top: 20px; justify-content: flex-end" />
+    </div>
+</template>
 
 <style scoped>
 .card-item {

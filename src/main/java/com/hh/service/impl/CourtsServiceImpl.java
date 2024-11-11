@@ -43,10 +43,10 @@ public class CourtsServiceImpl implements CourtsService {
     }
 
     @Override
-    public PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer courtId, String courtNumber) {
+    public PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer categoryId, String courtNumber) {
         PageBean<Court> pb = new PageBean<>();
         PageHelper.startPage(pageNum,pageSize);
-        List<Court> cs = courtMapper.select1(courtId, courtNumber);
+        List<Court> cs = courtMapper.select1(categoryId, courtNumber);
 
         Page<Court> p = (Page<Court>) cs;
 

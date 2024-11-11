@@ -14,7 +14,7 @@ public interface CourtsService {
     int updateCourt(Court court);
     int deleteCourt(Integer courtId);
 
-    PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer courtId, String courtNumber);
+    PageBean<Court> list1(Integer pageNum, Integer pageSize, Integer categoryId, String courtNumber);
 
     List<TimeSlots> getAllTimeSlot();
     List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId,String date);

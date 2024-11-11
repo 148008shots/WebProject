@@ -12,11 +12,11 @@
 	<select id="select1" resultType="Court">
 		SELECT * FROM courts
 		<where>
-			<if test="courtId != null">
-				AND court_id = #{courtId}
+			<if test="categoryId!=null">
+				AND category_id = #{categoryId}
 			</if>
-			<if test="courtNumber != null and courtNumber != ''">
-				AND court_number = #{courtNumber}
+			<if test="courtNumber != null">
+				AND court_number LIKE CONCAT('%', #{courtNumber}, '%')
 			</if>
 		</where>
 	</select>
