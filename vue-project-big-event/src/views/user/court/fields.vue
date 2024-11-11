@@ -212,11 +212,6 @@ const fetchTimeSlotsForVenue = async (venue, date) => {
         console.error('Error fetching time slots for venue:', error)
     }
 }
-// 页码变化
-const onSizeChange = size => {
-    pageSize.value = size
-    fetchCourts()
-}
 // 监听对话框的可见性变化
 const dialogWatch = watch(bookingDialogVisible, newValue => {
     if (!newValue) {
@@ -239,6 +234,11 @@ const closeBookingDialog = () => {
 //页码发生变化
 const onCurrentChange = num => {
     pageNum.value = num
+    fetchCourts()
+}
+// 页码变化
+const onSizeChange = size => {
+    pageSize.value = size
     fetchCourts()
 }
 onMounted(() => {

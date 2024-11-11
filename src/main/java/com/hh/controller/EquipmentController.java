@@ -1,8 +1,6 @@
 package com.hh.controller;
 
-import com.hh.pojo.Equipment;
-import com.hh.pojo.EquipmentBorrowing;
-import com.hh.pojo.Result;
+import com.hh.pojo.*;
 import com.hh.service.EquipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +17,17 @@ public class EquipmentController {
     public Result getAllEquipments(){
         List<Equipment> eq =  equipmentService.getEquipmentList();
         return Result.success(eq);
+    }
+
+    @GetMapping
+    public Result<PageBean<Equipment>>  listEquipment(
+            Integer pageNum,
+            Integer pageSize,
+            @RequestParam(required = false) String searchEquipmentName // 场地名称
+    ) {
+        // 调用服务层方法获取球场信息列表
+        PageBean<Equipment> pageBean= equipmentService.equipmentList(pageNum,pageSize,searchEquipmentName);
+        return Result.success(pageBean);
     }
     @PostMapping("/addEquipment")
     public Result addEquipment(@RequestBody Equipment equipment) {

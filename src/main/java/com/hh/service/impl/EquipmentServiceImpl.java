@@ -1,8 +1,11 @@
 package com.hh.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.hh.mapper.EquipmentMapper;
 import com.hh.pojo.Equipment;
 import com.hh.pojo.EquipmentBorrowing;
+import com.hh.pojo.PageBean;
 import com.hh.service.EquipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +76,19 @@ public class EquipmentServiceImpl implements EquipmentService {
     public boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity) {
         // 减少器材数量的逻辑
         return equipmentMapper.updateEquipmentQuantity(equipmentId, -borrowQuantity);
+    }
+
+    @Override
+    public PageBean<Equipment> equipmentList(Integer pageNum, Integer pageSize, String searchEquipmentName) {
+        PageBean<Equipment> pb= new PageBean<>();
+        PageHelper.startPage(pageNum,pageSize);
+        List<Equipment> eq = equipmentMapper.selectEquipment(searchEquipmentName);
+
+        Page<Equipment> p= (Page<Equipment>) eq;
+
+        pb.setItems(p.getResult());
+        pb.setTotal(p.getTotal());
+        return pb;
     }
 
     public boolean increaseEquipmentQuantity(Integer equipmentId, Integer addQuantity) {

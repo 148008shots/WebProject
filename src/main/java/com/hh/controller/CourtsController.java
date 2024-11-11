@@ -21,8 +21,6 @@ public class CourtsController {
             @RequestParam(required = false) Integer categoryId,//分类id
             @RequestParam(required = false) String courtName // 场地名称
     ) {
-        System.out.println(categoryId);
-        System.out.println(courtName);
         // 调用服务层方法获取球场信息列表
         PageBean<Court> pageBean= courtsService.list1(pageNum,pageSize,categoryId,courtName);
         return Result.success(pageBean);

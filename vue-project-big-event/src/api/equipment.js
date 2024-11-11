@@ -2,8 +2,8 @@
 import request from '@/utils/request.js'
 
 // 获取全部器材列表
-export const fetchAllEquipments = () => {
-    return request.get('/equipment/getAllEquipments')
+export const fetchAllEquipments = params => {
+    return request.get('/equipment', { params: params })
 }
 export const addEquipment = equipment => {
     return request.post('/equipment/addEquipment', equipment)

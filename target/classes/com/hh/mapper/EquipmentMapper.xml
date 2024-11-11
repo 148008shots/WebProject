@@ -4,4 +4,12 @@
 		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hh.mapper.EquipmentMapper">
 
+	<select id="selectEquipment" resultType="equipment">
+		SELECT * FROM equipment
+		<where>
+			<if test="searchEquipmentName != null">
+				AND name LIKE CONCAT('%', #{searchEquipmentName}, '%')
+			</if>
+		</where>
+	</select>
 </mapper>

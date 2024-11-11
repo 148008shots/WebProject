@@ -62,4 +62,7 @@ public interface EquipmentMapper {
     // 更新器材数量，changeQuantity为正数时增加，为负数时减少
     @Update("UPDATE equipment SET equipment_count = equipment_count + #{changeQuantity} WHERE equipment_id = #{equipmentId}")
     boolean updateEquipmentQuantity(@Param("equipmentId") int equipmentId, @Param("changeQuantity") int changeQuantity);
+
+    List selectEquipment(String searchEquipmentName);
 }
+
