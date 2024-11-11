@@ -19,6 +19,11 @@ public interface EquipmentService {
     boolean updateEquipmentBorrowing(EquipmentBorrowing borrowing);
 
     boolean updateBorrowingStatus(Integer borrowingId, Integer newStatus);
+
+
+    boolean increaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity);
+
+    boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity);
 }
 
 

@@ -82,6 +82,8 @@ const updateBorrowStatus = async () => {
     }
     const params = {
         borrowingId: currentBorrowing.value.borrowingId,
+        equipmentId: currentBorrowing.value.equipmentId,
+        borrowQuantity: currentBorrowing.value.borrowQuantity,
         newStatus: currentBorrowing.value.borrowStatus
     }
     try {

@@ -39,7 +39,7 @@ public interface EquipmentMapper {
     // 查询全部预定信息
     @Select("SELECT * FROM `equipmentborrowings`")
     List<EquipmentBorrowing> getAllBorrowings();
-
+    //查询所用详细的借用信息结合用户表查询用户名和器材表查询器材图片
     @Select("SELECT " +
             "eb.borrowing_id AS borrowingId, " +
             "eb.equipment_id AS equipmentId, " +
@@ -58,4 +58,8 @@ public interface EquipmentMapper {
 
     @Update("UPDATE equipmentborrowings SET borrow_status = #{newStatus} WHERE borrowing_id = #{borrowingId}")
     int updateBorrowStatus(@Param("borrowingId") int borrowingId, @Param("newStatus") int newStatus);
+
+    // 更新器材数量，changeQuantity为正数时增加，为负数时减少
+    @Update("UPDATE equipment SET equipment_count = equipment_count + #{changeQuantity} WHERE equipment_id = #{equipmentId}")
+    boolean updateEquipmentQuantity(@Param("equipmentId") int equipmentId, @Param("changeQuantity") int changeQuantity);
 }

@@ -70,4 +70,13 @@ public class EquipmentServiceImpl implements EquipmentService {
         int result = equipmentMapper.updateBorrowStatus(borrowingId, newStatus);
         return result > 0;
     }
+    public boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity) {
+        // 减少器材数量的逻辑
+        return equipmentMapper.updateEquipmentQuantity(equipmentId, -borrowQuantity);
+    }
+
+    public boolean increaseEquipmentQuantity(Integer equipmentId, Integer addQuantity) {
+        // 增加器材数量的逻辑
+        return equipmentMapper.updateEquipmentQuantity(equipmentId, addQuantity);
+    }
 }

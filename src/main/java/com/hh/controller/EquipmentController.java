@@ -62,9 +62,24 @@ public class EquipmentController {
     @PutMapping("/updateBorrowing1")
     public Result updateBorrowingStatus(
             @RequestParam Integer borrowingId,
-            @RequestParam String newStatus
+            @RequestParam Integer equipmentId,
+            @RequestParam Integer newStatus,
+            @RequestParam Integer borrowQuantity
     ) {
-        boolean result = equipmentService.updateBorrowingStatus(borrowingId, Integer.valueOf(newStatus));
-        return result ? Result.success("更新成功") : Result.error("更新失败");
+        boolean result;
+//        预约更新预约表里面的状态
+        equipmentService.updateBorrowingStatus(borrowingId,newStatus);
+//        对器材表里面的器材数量进行修改
+        if (newStatus == 1) {
+            // 如果newStatus为1，执行减少数量操作
+            result = equipmentService.decreaseEquipmentQuantity(equipmentId, borrowQuantity);
+        } else if (newStatus == 2) {
+            // 如果newStatus为2，执行增加数量操作
+            result = equipmentService.increaseEquipmentQuantity(equipmentId, borrowQuantity);
+        } else {
+            // 如果newStatus不是1或2，返回错误
+            return Result.error("状态码不正确，无法执行操作");
+        }
+        return result ? Result.success("操作成功") : Result.error("操作失败");
     }
 }
