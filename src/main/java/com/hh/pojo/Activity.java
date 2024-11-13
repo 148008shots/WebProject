@@ -8,6 +8,7 @@ import java.util.Date;
 public class Activity {
     private int activityId;
     private int organizerId;
+    private int status;
     private String name;
     private String location;
     private int courtId;
