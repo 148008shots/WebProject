@@ -1,58 +1,126 @@
 <template>
     <div>
-        <!-- 俱乐部列表 -->
-        <el-table :data="joinedClubs" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="name" label="俱乐部名称" width="180"></el-table-column>
-            <el-table-column prop="category" label="俱乐部类别" width="180"></el-table-column>
-            <el-table-column prop="description" label="简介" width="300"></el-table-column>
-            <el-table-column prop="address" label="地址" width="180"></el-table-column>
-            <el-table-column prop="contact" label="联系人" width="180"></el-table-column>
-            <el-table-column prop="phone" label="电话" width="180"></el-table-column>
+        <h2>我加入的社团</h2>
+        <!-- 全部社团列表 -->
+        <el-table :data="userClubs" style="width: 100%; margin-top: 20px">
+            <el-table-column prop="name" label="社团名称" width="180"></el-table-column>
+            <el-table-column prop="category" label="社团类别" width="180"></el-table-column>
+            <el-table-column prop="description" label="社团简介" width="300"></el-table-column>
+            <el-table-column prop="address" label="社团地址" width="180"></el-table-column>
+            <el-table-column prop="contact" label="社团会长" width="180"></el-table-column>
+            <el-table-column prop="members" label="社团人数" width="180"></el-table-column>
+            <el-table-column prop="clubsPic" label="社团图片" width="180">
+                <template #default="scope">
+                    <img :src="scope.row.clubsPic" alt="社团图片" class="club-pic" />
+                </template>
+            </el-table-column>
             <el-table-column label="操作" width="150">
                 <template #default="scope">
-                    <el-button size="mini" @click="editClub(scope.row)">编辑</el-button>
-                    <el-button size="mini" type="danger" @click="deleteClub(scope.row)">删除</el-button>
+                    <el-button @click="joinClub(scope.row)">加入社团</el-button>
+                    <el-button @click="leaveClub(scope.row)" type="danger">退出社团</el-button>
                 </template>
             </el-table-column>
         </el-table>
     </div>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { ElTable, ElTableColumn, ElButton } from 'element-plus'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus'
+import useUserInfoStore from '@/stores/userInfo'
+import { fetchAllClubs, joinClubApi, fetchUserClubsApi1 } from '@/api/clubs'
 
-export default {
-    components: {
-        ElTable,
-        ElTableColumn,
-        ElButton
-    },
-    setup() {
-        const joinedClubs = ref([
-            { name: '篮球俱乐部', category: '体育', description: '篮球爱好者的聚集地', address: '北京市朝阳区', contact: '张三', phone: '12345678901' },
-            { name: '游泳俱乐部', category: '体育', description: '游泳爱好者的聚集地', address: '上海市浦东新区', contact: '李四', phone: '12345678902' },
-            { name: '瑜伽俱乐部', category: '健身', description: '瑜伽爱好者的聚集地', address: '广州市天河区', contact: '王五', phone: '12345678903' }
-        ])
+// 当前用户已加入的社团ID列表
+const userClubs = ref([])
+// 所有社团列表模型
+const allClubs = ref([])
 
-        const editClub = club => {
-            console.log('编辑俱乐部:', club)
-            // 这里可以添加编辑俱乐部的逻辑
-        }
+// 获取当前浏览器用户信息
+const userInfoStore = useUserInfoStore()
 
-        const deleteClub = club => {
-            console.log('删除俱乐部:', club)
-            // 这里可以添加删除俱乐部的逻辑
-            joinedClubs.value = joinedClubs.value.filter(c => c !== club)
-        }
-
-        return {
-            joinedClubs,
-            editClub,
-            deleteClub
-        }
+// 初始化已加入社团列表
+const initUserClubs = async () => {
+    try {
+        const response = await fetchUserClubsApi1(userInfoStore.info.id)
+        userClubs.value = response.data
+    } catch (error) {
+        console.error('获取用户社团列表失败:', error)
+        ElMessage.error('获取社团列表失败，请稍后再试。')
     }
 }
+
+// 加入社团
+const joinClub = async row => {
+    // 检查用户是否已经加入了该社团
+    if (userClubs.value.includes(row.id)) {
+        ElMessage.warning('你已经加入了该社团')
+        return
+    }
+    try {
+        let params = {
+            userId: userInfoStore.info.id,
+            clubId: row.id
+        }
+        // 调用后端API，传入社团ID和用户ID
+        const response = await joinClubApi(params)
+        // 检查响应状态，如果成功，可以给用户反馈
+        if (response.code === 0) {
+            // 更新UI，例如显示一个提示消息
+            ElMessage.success('你已成功加入社团！')
+            // 可能还需要重新获取社团列表以更新社团人数等信息
+            await initUserClubs()
+            // 更新用户已加入的社团列表
+            userClubs.value.push(row.id)
+        } else {
+            // 处理错误情况
+            ElMessage.error('加入社团失败，请稍后再试。')
+        }
+    } catch (error) {
+        // 捕获并处理错误
+        console.error('加入社团时发生错误：', error)
+        ElMessage.error('加入社团时发生错误，请稍后再试。')
+    }
+}
+
+// 退出社团
+const leaveClub = async row => {
+    // 检查用户是否已经加入了该社团
+    if (!userClubs.value.includes(row.id)) {
+        ElMessage.warning('你还没有加入该社团')
+        return
+    }
+    try {
+        let params = {
+            userId: userInfoStore.info.id,
+            clubId: row.id
+        }
+        // 调用后端API，传入社团ID和用户ID
+        const response = await leaveClubApi(params)
+        // 检查响应状态，如果成功，可以给用户反馈
+        if (response.code === 0) {
+            // 更新UI，例如显示一个提示消息
+            ElMessage.success('你已成功退出社团！')
+            // 可能还需要重新获取社团列表以更新社团人数等信息
+            await fetchAllClubs1()
+            // 更新用户已加入的社团列表
+            const index = userClubs.value.indexOf(row.id)
+            if (index > -1) {
+                userClubs.value.splice(index, 1)
+            }
+        } else {
+            // 处理错误情况
+            ElMessage.error('退出社团失败，请稍后再试。')
+        }
+    } catch (error) {
+        // 捕获并处理错误
+        console.error('退出社团时发生错误：', error)
+        ElMessage.error('退出社团时发生错误，请稍后再试。')
+    }
+}
+onMounted(() => {
+    // 调用获取所有俱乐部的函数
+    initUserClubs()
+})
 </script>
 
 <style scoped>
@@ -68,5 +136,11 @@ export default {
 
 .el-button {
     margin: 0 5px;
+}
+
+.club-pic {
+    width: 100%; /* 或者你可以根据需要设置图片的宽度 */
+    height: auto; /* 保持图片的宽高比 */
+    object-fit: cover; /* 如果图片的宽高比与单元格不一致，可以裁剪图片 */
 }
 </style>

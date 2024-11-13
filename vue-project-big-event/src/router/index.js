@@ -11,7 +11,6 @@ import UserInfoVue from '@/views/user/UserInfo.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
 import allClubs from '@/views/user/club/all-clubs.vue'
 import joinedClubs from '@/views/user/club/joined-clubs.vue'
-import myClubs from '@/views/user/club/my-clubs.vue'
 import Equipment from '@/views/user/court/equipment.vue'
 import Fields from '@/views/user/court/fields.vue'
 import index from '@/components/index.vue'
@@ -151,11 +150,6 @@ const routes = [
                 path: '/club/joinedClubs',
                 component: joinedClubs,
                 name: 'JoinedClubs' // 添加路由名称
-            },
-            {
-                path: '/club/myClubs',
-                component: myClubs,
-                name: 'MyClubs' // 添加路由名称
             },
             {
                 path: '/court/Equipment',

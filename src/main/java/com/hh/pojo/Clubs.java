@@ -6,8 +6,10 @@ import lombok.Data;
 public class Clubs {
     private int clubId;
     private int categoryId;
+    private int members;
     private String name;
     private String description;
     private String address;
+    private String clubsPic;//场地封面
     private int contactUserId;
 }

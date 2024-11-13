@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hh.mapper.ClubsMapper">
+	<select id="selectClubByUserId1" resultType="com.hh.pojo.Clubs">
+		SELECT c.*
+		FROM clubs c
+			     INNER JOIN userclubs uc ON c.club_id = uc.club_id
+		WHERE uc.user_id = #{userId}
+	</select>
+</mapper>

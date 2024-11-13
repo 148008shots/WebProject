@@ -77,11 +77,10 @@ const handelCommand = command => {
                         <el-icon>
                             <UserFilled />
                         </el-icon>
-                        <span>俱乐部</span>
+                        <span>体育社团</span>
                     </template>
-                    <el-menu-item index="/club/myClubs">我创建的俱乐部</el-menu-item>
-                    <el-menu-item index="/club/joinedClubs">我加入的俱乐部</el-menu-item>
-                    <el-menu-item index="/club/allClubs">全部俱乐部</el-menu-item>
+                    <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
+                    <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
                 </el-sub-menu>
                 <!-- 活动 -->
                 <el-menu-item index="/activity">
