@@ -73,10 +73,6 @@ public class EquipmentServiceImpl implements EquipmentService {
         int result = equipmentMapper.updateBorrowStatus(borrowingId, newStatus);
         return result > 0;
     }
-    public boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity) {
-        // 减少器材数量的逻辑
-        return equipmentMapper.updateEquipmentQuantity(equipmentId, -borrowQuantity);
-    }
 
     @Override
     public PageBean<Equipment> equipmentList(Integer pageNum, Integer pageSize, String searchEquipmentName) {
@@ -89,6 +85,10 @@ public class EquipmentServiceImpl implements EquipmentService {
         pb.setItems(p.getResult());
         pb.setTotal(p.getTotal());
         return pb;
+    }
+    public boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity) {
+        // 减少器材数量的逻辑
+        return equipmentMapper.updateEquipmentQuantity(equipmentId, -borrowQuantity);
     }
 
     public boolean increaseEquipmentQuantity(Integer equipmentId, Integer addQuantity) {

@@ -16,7 +16,6 @@
             </el-table-column>
             <el-table-column label="操作" width="150">
                 <template #default="scope">
-                    <el-button @click="joinClub(scope.row)">加入社团</el-button>
                     <el-button @click="leaveClub(scope.row)" type="danger">退出社团</el-button>
                 </template>
             </el-table-column>
@@ -28,7 +27,7 @@
 import { ref, onMounted } from 'vue'
 import { ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
-import { fetchAllClubs, joinClubApi, fetchUserClubsApi1 } from '@/api/clubs'
+import { fetchUserClubsApi1, updateUserClub } from '@/api/clubs'
 
 // 当前用户已加入的社团ID列表
 const userClubs = ref([])
@@ -49,59 +48,22 @@ const initUserClubs = async () => {
     }
 }
 
-// 加入社团
-const joinClub = async row => {
-    // 检查用户是否已经加入了该社团
-    if (userClubs.value.includes(row.id)) {
-        ElMessage.warning('你已经加入了该社团')
-        return
-    }
-    try {
-        let params = {
-            userId: userInfoStore.info.id,
-            clubId: row.id
-        }
-        // 调用后端API，传入社团ID和用户ID
-        const response = await joinClubApi(params)
-        // 检查响应状态，如果成功，可以给用户反馈
-        if (response.code === 0) {
-            // 更新UI，例如显示一个提示消息
-            ElMessage.success('你已成功加入社团！')
-            // 可能还需要重新获取社团列表以更新社团人数等信息
-            await initUserClubs()
-            // 更新用户已加入的社团列表
-            userClubs.value.push(row.id)
-        } else {
-            // 处理错误情况
-            ElMessage.error('加入社团失败，请稍后再试。')
-        }
-    } catch (error) {
-        // 捕获并处理错误
-        console.error('加入社团时发生错误：', error)
-        ElMessage.error('加入社团时发生错误，请稍后再试。')
-    }
-}
-
 // 退出社团
 const leaveClub = async row => {
-    // 检查用户是否已经加入了该社团
-    if (!userClubs.value.includes(row.id)) {
-        ElMessage.warning('你还没有加入该社团')
-        return
-    }
     try {
         let params = {
             userId: userInfoStore.info.id,
-            clubId: row.id
+            clubId: row.clubId,
+            operation: 1
         }
         // 调用后端API，传入社团ID和用户ID
-        const response = await leaveClubApi(params)
+        const response = await updateUserClub(params)
         // 检查响应状态，如果成功，可以给用户反馈
         if (response.code === 0) {
             // 更新UI，例如显示一个提示消息
             ElMessage.success('你已成功退出社团！')
             // 可能还需要重新获取社团列表以更新社团人数等信息
-            await fetchAllClubs1()
+            await initUserClubs()
             // 更新用户已加入的社团列表
             const index = userClubs.value.indexOf(row.id)
             if (index > -1) {

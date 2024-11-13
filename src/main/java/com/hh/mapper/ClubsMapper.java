@@ -31,4 +31,7 @@ public interface ClubsMapper {
     int updateClubMember(Integer nweMember,Integer clubId);
 
     List<Clubs> selectClubByUserId1(Integer userId);
+
+    @Delete("DELETE FROM userclubs WHERE club_id = #{clubId} AND user_id = #{userId}")
+    void leaveClub(Integer userId, Integer clubId);
 }

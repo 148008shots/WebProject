@@ -27,7 +27,7 @@
 import { ref } from 'vue'
 import { ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
-import { fetchAllClubs, addClub, deleteClub, updateClub, joinClubApi, fetchUserClubsApi } from '@/api/clubs'
+import { fetchAllClubs, addClub, deleteClub, updateClub, joinClubApi, fetchUserClubsApi, updateUserClub } from '@/api/clubs'
 // 当前用户已加入的社团ID列表
 const userClubs = ref([])
 //所有社团列表模型
@@ -59,10 +59,11 @@ const joinClub = async row => {
     try {
         let params = {
             userId: userInfoStore.info.id,
-            clubId: row.clubId
+            clubId: row.clubId,
+            operation: 0
         }
         // 调用后端API，传入社团ID和用户ID
-        const response = await joinClubApi(params)
+        const response = await updateUserClub(params)
         // 检查响应状态，如果成功，可以给用户反馈
         if (response.code === 0) {
             // 更新UI，例如显示一个提示消息

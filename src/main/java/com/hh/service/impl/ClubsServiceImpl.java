@@ -42,10 +42,24 @@ public class ClubsServiceImpl implements ClubsService {
     public void joinClub(Integer userId, Integer clubId) {
 
         clubsMapper.joinClub(userId,clubId);
-        Integer nweMember = 1;
-        clubsMapper.updateClubMember(nweMember,clubId);
     }
 
+    @Override
+    public void leaveClub(Integer userId, Integer clubId) {
+        clubsMapper.leaveClub(userId,clubId);
+    }
+
+    @Override
+    public int increaseClubMember(Integer clubId) {
+        Integer nweMember = 1;
+       return clubsMapper.updateClubMember(nweMember,clubId);
+    }
+
+    @Override
+    public int decreaseClubMember(Integer clubId) {
+        Integer nweMember = 1;
+        return clubsMapper.updateClubMember(-nweMember,clubId);
+    }
     @Override
     public List<UserClubs> selectClubByUserId(int userId) {
         return clubsMapper.selectClubByUserId(userId);
