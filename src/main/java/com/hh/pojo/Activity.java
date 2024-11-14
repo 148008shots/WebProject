@@ -9,10 +9,13 @@ public class Activity {
     private int activityId;
     private int organizerId;
     private int status;
+    private int signedUpCount;
     private String name;
     private String location;
     private int courtId;
     private Date startTime;
     private Date endTime;
+    private Date signUpDeadline;
+
 
 }

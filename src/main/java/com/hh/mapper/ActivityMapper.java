@@ -1,6 +1,7 @@
 package com.hh.mapper;
 
 import com.hh.pojo.Activity;
+import com.hh.pojo.Registration;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -18,4 +19,19 @@ public interface ActivityMapper {
 
     @Select("SELECT * FROM activities")
     List<Activity> getAllActivities();
+
+    @Select("SELECT * FROM registrations")
+    List<Registration> getAllRegistrations();
+
+    @Select("SELECT * FROM registrations WHERE activity_id = #{activityId} AND user_id = #{userId}")
+    List<Registration> selectRegistrationsByUserIdAndActivityId(Integer userId, Integer activityId);
+
+    @Insert("INSERT INTO registrations (user_id, activity_id) VALUES (#{userId}, #{activityId})")
+    void joinActivity(Integer userId, Integer activityId);
+
+    @Update("UPDATE activities SET signed_up_count = signed_up_count + #{nweMember} WHERE activity_id = #{activityId}")
+    int updateActivityMember(Integer nweMember, Integer activityId);
+
+    @Delete("DELETE FROM registrations WHERE activity_id = #{activityId} AND user_id = #{userId}")
+    void leaveActivity(Integer userId, Integer activityId);
 }

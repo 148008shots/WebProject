@@ -5,6 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.hh.mapper.ActivityMapper;
 import com.hh.pojo.Activity;
 import com.hh.pojo.PageBean;
+import com.hh.pojo.Registration;
 import com.hh.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,13 +40,41 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public PageBean<Activity> getAllActivities1(Integer pageNum, Integer pageSize) {
         PageBean<Activity> pb = new PageBean<>();
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<Activity> ac = activityMapper.getAllActivities();
         Page<Activity> p = (Page<Activity>) ac;
 
         pb.setItems(p.getResult());
         pb.setTotal(p.getTotal());
         return pb;
+    }
+
+    @Override
+    public void joinActivity(Integer userId, Integer activityId) {
+        activityMapper.joinActivity(userId, activityId);
+    }
+
+    @Override
+    public int increaseClubMember(Integer activityId) {
+        Integer nweMember = 1;
+        return activityMapper.updateActivityMember(nweMember, activityId);
+    }
+
+    @Override
+    public void leaveActivity(Integer userId, Integer activityId) {
+        activityMapper.leaveActivity(userId, activityId);
+
+    }
+
+    @Override
+    public List<Registration> selectRegistrationsByUserIdAndActivityId(Integer userId, Integer activityId) {
+        return activityMapper.selectRegistrationsByUserIdAndActivityId(userId, activityId);
+    }
+
+    @Override
+    public int decreaseClubMember(Integer activityId) {
+        Integer nweMember = 1;
+        return activityMapper.updateActivityMember(-nweMember, activityId);
     }
 
 }

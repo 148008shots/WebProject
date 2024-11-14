@@ -14,7 +14,8 @@ import joinedClubs from '@/views/user/club/joined-clubs.vue'
 import Equipment from '@/views/user/court/equipment.vue'
 import Fields from '@/views/user/court/fields.vue'
 import index from '@/components/index.vue'
-import activity from '@/views/user/activity.vue'
+import allActivity from '@/views/user/activity/allActivity.vue'
+import joinedActivity from '@/views/user/activity/joinedActivity.vue'
 import ManageUser from '@/views/admin/ManageUser.vue'
 import ManageClub from '@/views/admin/ManageClub.vue'
 import ManageCourt from '@/views/admin/ManageCourt.vue'
@@ -167,9 +168,14 @@ const routes = [
                 name: 'Index' // 添加路由名称
             },
             {
-                path: '/activity',
-                component: activity,
-                name: 'Activity' // 添加路由名称
+                path: '/activity/allActivity',
+                component: allActivity,
+                name: 'allActivity' // 添加路由名称
+            },
+            {
+                path: '/activity/joinedActivity',
+                component: joinedActivity,
+                name: 'joinedActivity' // 添加路由名称
             }
         ],
         beforeEnter: (to, from, next) => {

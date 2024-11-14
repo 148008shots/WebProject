@@ -2,6 +2,7 @@ package com.hh.controller;
 
 import com.hh.pojo.Activity;
 import com.hh.pojo.PageBean;
+import com.hh.pojo.Registration;
 import com.hh.pojo.Result;
 import com.hh.service.ActivityService;
 import com.hh.utils.ThreadLocalUtil;
@@ -58,4 +59,62 @@ public class ActivityController {
             return Result.error("更新失败");
         }
     }
+
+    @PostMapping("/signUpForActivity")
+    public Result<String> signUpForActivity(
+            @RequestParam Integer userId,
+            @RequestParam Integer activityId,
+            @RequestParam Integer operation) {
+        Integer resultCode = null; // 用于存储操作结果的状态码
+        String resultMessage = null; // 用于存储操作结果的消息
+
+        // 根据传来的userId和activityId查找报名表里面是否存在相关记录
+        List<Registration> registrationList = activityService.selectRegistrationsByUserIdAndActivityId(userId, activityId);
+        boolean isRegistered = registrationList != null && !registrationList.isEmpty();
+
+        try {
+            if (operation != null) {
+                switch (operation) {
+                    case 0: // 加入活动
+                        if (isRegistered) {
+                            // 如果已报名，则返回失败结果
+                            resultCode = 1;
+                            resultMessage = "您已报名过这个活动";
+                        } else {
+                            // 如果未报名，则加入活动
+                            activityService.joinActivity(userId, activityId);
+                            activityService.increaseClubMember(activityId);
+                            resultCode = 0; // 成功
+                            resultMessage = "成功加入活动";
+                        }
+                        break;
+                    case 1: // 退出活动
+                        if (isRegistered) {
+                            // 如果已报名，则退出活动
+                            activityService.leaveActivity(userId, activityId);
+                            activityService.decreaseClubMember(activityId);
+                            resultCode = 0; // 成功
+                            resultMessage = "成功退出活动";
+                        } else {
+                            // 如果未报名，则返回失败结果
+                            resultCode = 1;
+                            resultMessage = "您未报名过这个活动，无法退出";
+                        }
+                        break;
+                    default:
+                        resultCode = 1; // 失败
+                        resultMessage = "无效的操作码";
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            // 捕获异常，设置失败的状态码和消息
+            resultCode = 1; // 失败
+            resultMessage = "操作失败: " + e.getMessage();
+        }
+
+        // 根据resultCode返回相应的Result对象
+        return new Result<>(resultCode, resultMessage, null);
+    }
+
 }

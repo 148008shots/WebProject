@@ -73,32 +73,36 @@ const handelCommand = command => {
                 </el-sub-menu>
                 <!-- 俱乐部 -->
                 <el-sub-menu index="2">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>体育社团</span>
-                    </template>
-                    <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
-                    <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
-                </el-sub-menu>
-                <!-- 活动 -->
-                <el-menu-item index="/activity">
+                  <template #title>
                     <el-icon>
-                        <Promotion />
+                      <UserFilled/>
                     </el-icon>
-                    <span>活动</span>
-                </el-menu-item>
-                <!-- 个人中心 -->
-                <el-sub-menu index="user">
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>个人中心</span>
-                    </template>
-                    <el-menu-item index="/user/info">
-                        <el-icon>
+                    <span>体育社团</span>
+                  </template>
+                  <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
+                  <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
+                </el-sub-menu>
+              <!-- 活动 -->
+              <el-sub-menu index="activity">
+                <template #title>
+                  <el-icon>
+                    <Promotion/>
+                  </el-icon>
+                  <span>校园活动</span>
+                </template>
+                <el-menu-item index="/activity/allActivity">全部活动</el-menu-item>
+                <el-menu-item index="/activity/joinedActivity">我参加的活动</el-menu-item>
+              </el-sub-menu>
+              <!-- 个人中心 -->
+              <el-sub-menu index="user">
+                <template #title>
+                  <el-icon>
+                    <UserFilled/>
+                  </el-icon>
+                  <span>个人中心</span>
+                </template>
+                <el-menu-item index="/user/info">
+                  <el-icon>
                             <User />
                         </el-icon>
                         <span>基本资料</span>

@@ -40,7 +40,6 @@ public class ClubsServiceImpl implements ClubsService {
 
     @Override
     public void joinClub(Integer userId, Integer clubId) {
-
         clubsMapper.joinClub(userId,clubId);
     }
 
