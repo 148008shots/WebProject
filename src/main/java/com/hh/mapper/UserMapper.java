@@ -30,4 +30,10 @@ public interface UserMapper {
 
     @Update("UPDATE user SET username = #{username}, nickname = #{nickname}, email = #{email}, phone = #{phone}, role = #{role}, update_time = NOW() WHERE id = #{id}")
     void updateInfo(User user);
+
+    @Select("select * from user where username = #{username} AND phone = #{phone}")
+    User selectByUserNameAndPhone(String username, String phone);
+
+    @Update("update user set password=#{md5String},update_time=now() where username = #{username}")
+    void resetUpdatePwd(String md5String, String username);
 }

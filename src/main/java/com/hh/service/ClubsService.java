@@ -12,12 +12,18 @@ public interface ClubsService {
     void updateClub(Clubs club);
 
     void joinClub(Integer userId, Integer clubId);
+
     void leaveClub(Integer userId, Integer clubId);
 
     int increaseClubMember(Integer clubId);
+
     int decreaseClubMember(Integer clubId);
 
     List<UserClubs> selectClubByUserId(int userId);
 
     List<Clubs> selectClubByUserId1(int userId);
+
+    List<UserClubs> selectUserClubsByUserIdAndClubId(Integer userId, Integer clubId);
 }
+
+

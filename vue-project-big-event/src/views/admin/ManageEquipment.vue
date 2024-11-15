@@ -5,7 +5,6 @@
         <el-button type="primary" @click="dialogVisible = true">添加器材</el-button>
         <!-- 器材列表 -->
         <el-table :data="equipments" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="equipmentId" label="器材ID" width="100"></el-table-column>
             <el-table-column prop="name" label="器材名称" width="180"></el-table-column>
             <el-table-column prop="equipmentCount" label="数量" width="100"></el-table-column>
             <el-table-column label="coverImg" width="150">
@@ -52,8 +51,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
+import {ref, onMounted} from 'vue'
+import {Plus} from '@element-plus/icons-vue'
 import {
   ElTable,
   ElTableColumn,
@@ -96,16 +95,16 @@ const editEquipment = equipment => {
 const deleteEquipment = async equipment => {
   // 使用 Element Plus 的 ElMessageBox 来显示确认删除的提示
   ElMessageBox.confirm('你确认删除该器材信息吗？', '温馨提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-    })
-        .then(async () => {
-            // 用户点击了确认，执行删除操作
-            try {
-                await deleteEquipmentApi(equipment.equipmentId)
-                ElMessage({
-                    type: 'success',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+      .then(async () => {
+        // 用户点击了确认，执行删除操作
+        try {
+          await deleteEquipmentApi(equipment.equipmentId)
+          ElMessage({
+            type: 'success',
                     message: '删除成功'
                 })
                 // 从列表中移除已删除的器材

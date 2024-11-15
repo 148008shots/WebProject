@@ -9,10 +9,10 @@ import java.util.List;
 @Mapper
 public interface ClubsMapper {
 
-    @Insert("INSERT INTO clubs (category_id, name, description, address, contact_user_id) VALUES (#{categoryId}, #{name}, #{description}, #{address}, #{contactUserId})")
+    @Insert("INSERT INTO clubs (category_id, name, description, address, contact_user_id,clubs_pic) VALUES (#{categoryId}, #{name}, #{description}, #{address}, #{contactUserId},#{clubsPic})")
     int insertClub(Clubs club);
 
-    @Update("UPDATE clubs SET category_id = #{categoryId}, name = #{name}, description = #{description}, address = #{address}, contact_user_id = #{contactUserId} WHERE club_id = #{clubId}")
+    @Update("UPDATE clubs SET category_id = #{categoryId}, name = #{name}, description = #{description}, address = #{address}, contact_user_id = #{contactUserId}, clubs_pic = #{clubsPic} WHERE club_id = #{clubId}")
     int updateClubById(Clubs club);
 
     @Select("SELECT * FROM clubs")
@@ -28,10 +28,14 @@ public interface ClubsMapper {
     List<UserClubs> selectClubByUserId(int userId);
 
     @Update("UPDATE clubs SET members = members + #{nweMember} WHERE club_id = #{clubId}")
-    int updateClubMember(Integer nweMember,Integer clubId);
+    int updateClubMember(Integer nweMember, Integer clubId);
 
     List<Clubs> selectClubByUserId1(Integer userId);
 
     @Delete("DELETE FROM userclubs WHERE club_id = #{clubId} AND user_id = #{userId}")
     void leaveClub(Integer userId, Integer clubId);
+
+
+    @Select("SELECT * FROM userclubs WHERE club_id = #{clubId} AND user_id = #{userId}")
+    List<UserClubs> selectUserClubsByUserIdAndClubId(Integer userId, Integer clubId);
 }

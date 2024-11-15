@@ -1,6 +1,7 @@
 package com.hh.controller;
 
 import com.hh.pojo.Clubs;
+import com.hh.pojo.Registration;
 import com.hh.pojo.UserClubs;
 import com.hh.service.ClubsService;
 import com.hh.pojo.Result;
@@ -51,6 +52,7 @@ public class ClubsController {
         clubsService.joinClub(userId,clubId);
         return Result.success("成功加入社团");
     }
+
     @GetMapping("/fetchUserClubs/{userId}")
     public Result<List<UserClubs>> fetchUserClubs(@PathVariable int userId) {
         List<UserClubs> userClubs =clubsService.selectClubByUserId(userId);
@@ -70,21 +72,37 @@ public class ClubsController {
         Integer resultCode = null; // 用于存储操作结果的状态码
         String resultMessage = null; // 用于存储操作结果的消息
 
-        // 根据operation的值决定是执行加入还是退出社团的操作
+        List<UserClubs> memberList = clubsService.selectUserClubsByUserIdAndClubId(userId, clubId);
+        boolean isMember = memberList != null && !memberList.isEmpty();
+
         try {
             if (operation != null) {
                 switch (operation) {
                     case 0: // 加入社团
-                        clubsService.joinClub(userId, clubId);
-                        clubsService.increaseClubMember(clubId);
-                        resultCode = 0; // 成功
-                        resultMessage = "成功加入社团";
+                        if (isMember) {
+                            // 如果已是成员，则返回失败结果
+                            resultCode = 1;
+                            resultMessage = "您已经是这个社团的成员";
+                        } else {
+                            // 如果不是成员，则加入社团
+                            clubsService.joinClub(userId, clubId);
+                            clubsService.increaseClubMember(clubId);
+                            resultCode = 0; // 成功
+                            resultMessage = "成功加入社团";
+                        }
                         break;
                     case 1: // 退出社团
-                        clubsService.leaveClub(userId, clubId);
-                        clubsService.decreaseClubMember(clubId);
-                        resultCode = 0; // 成功
-                        resultMessage = "成功退出社团";
+                        if (isMember) {
+                            // 如果是成员，则退出社团
+                            clubsService.leaveClub(userId, clubId);
+                            clubsService.decreaseClubMember(clubId);
+                            resultCode = 0; // 成功
+                            resultMessage = "成功退出社团";
+                        } else {
+                            // 如果不是成员，则返回失败结果
+                            resultCode = 1;
+                            resultMessage = "您不是这个社团的成员，无法退出";
+                        }
                         break;
                     default:
                         resultCode = 1; // 失败

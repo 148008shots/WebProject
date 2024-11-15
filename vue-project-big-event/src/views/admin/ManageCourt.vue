@@ -134,8 +134,6 @@ const fetchCategories = async () => {
     categorys.value = result.data
 }
 
-fetchCategories()
-onMounted(fetchCourts)
 // 编辑框显示
 const editVenue = venue => {
     isEditing.value = '编辑场地'
@@ -209,16 +207,21 @@ const updateCourt1 = async () => {
     let result = await updateCourt(currentVenue.value)
     // 根据结果展示消息
     if (result.message) {
-        ElMessage.success(result.message)
+      ElMessage.success(result.message)
     } else {
-        ElMessage.error('更新失败')
+      ElMessage.error('更新失败')
     }
-    // 关闭对话框
-    dialogVisible.value = false
+  // 关闭对话框
+  dialogVisible.value = false
 
-    // 重新加载场地列表
-    fetchCourts()
+  // 重新加载场地列表
+  fetchCourts()
 }
+// 在组件挂载入时获取器材列表
+onMounted(() => {
+  fetchCategories()
+  fetchCourts()
+})
 </script>
 
 <style scoped>

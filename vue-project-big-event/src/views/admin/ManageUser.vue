@@ -9,24 +9,32 @@
             <el-table-column prop="email" label="邮箱" width="200"></el-table-column>
             <el-table-column prop="phone" label="电话" width="150"></el-table-column>
             <el-table-column label="userPic" width="150">
-                <template #default="scope">
-                    <img :src="scope.row.userPic" alt="头像" style="width: 50px; height: 50px; border-radius: 50%" />
-                </template>
+              <template #default="scope">
+                <img :src="scope.row.userPic" alt="头像" style="width: 50px; height: 50px; border-radius: 50%"/>
+              </template>
             </el-table-column>
-            <el-table-column prop="role" label="角色" width="150">
-                <template #default="scope">
-                    <span v-if="scope.row.role === 1" style="color: red">管理员</span>
-                    <span v-else style="color: green">用户</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="createTime" label="创建时间" width="180"></el-table-column>
-            <el-table-column prop="updateTime" label="修改时间" width="180"></el-table-column>
-            <el-table-column label="操作" width="180">
-                <template #default="scope">
-                    <el-button @click="editUser(scope.row)">编辑</el-button>
-                    <el-button type="danger" @click="deleteUser1(scope.row)">删除</el-button>
-                </template>
-            </el-table-column>
+          <el-table-column prop="role" label="角色" width="150">
+            <template #default="scope">
+              <span v-if="scope.row.role === 1" style="color: red">管理员</span>
+              <span v-else style="color: green">用户</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间" width="180">
+            <template #default="scope">
+              <span v-if="scope.row.createTime">{{ formatDate(scope.row.createTime) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="updateTime" label="修改时间" width="180">
+            <template #default="scope">
+              <span v-if="scope.row.updateTime">{{ formatDate(scope.row.updateTime) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="180">
+            <template #default="scope">
+              <el-button @click="editUser(scope.row)">编辑</el-button>
+              <el-button type="danger" @click="deleteUser1(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
         </el-table>
         <!-- 编辑用户弹出框 -->
         <el-dialog v-model="dialogVisible" title="编辑用户">
@@ -114,15 +122,30 @@ const deleteUser1 = row => {
 
 const saveEdit = async () => {
     console.log('编辑的用户数据:', editForm.value)
-    let result = await updateUserInfo(editForm.value)
-    if (result.message) {
-        ElMessage.success(result.message)
-    } else {
-        ElMessage.error('更新失败')
-    }
-    // 关闭对话框
-    dialogVisible.value = false
-    fetchUsers()
+  let result = await updateUserInfo(editForm.value)
+  if (result.message) {
+    ElMessage.success(result.message)
+  } else {
+    ElMessage.error('更新失败')
+  }
+  // 关闭对话框
+  dialogVisible.value = false
+  fetchUsers()
+}
+// 详细时间
+const formatDate = dateStr => {
+  const date = new Date(dateStr)
+  if (isNaN(date)) {
+    console.error('Invalid date string')
+    return ''
+  }
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1 // getMonth() 返回的月份是从0开始的
+  const day = date.getDate()
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+  const second = date.getSeconds()
+  return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
 }
 </script>
 

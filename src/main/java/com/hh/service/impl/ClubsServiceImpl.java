@@ -57,14 +57,21 @@ public class ClubsServiceImpl implements ClubsService {
     @Override
     public int decreaseClubMember(Integer clubId) {
         Integer nweMember = 1;
-        return clubsMapper.updateClubMember(-nweMember,clubId);
+        return clubsMapper.updateClubMember(-nweMember, clubId);
     }
+
     @Override
     public List<UserClubs> selectClubByUserId(int userId) {
         return clubsMapper.selectClubByUserId(userId);
     }
+
     @Override
     public List<Clubs> selectClubByUserId1(int userId) {
         return clubsMapper.selectClubByUserId1(userId);
+    }
+
+    @Override
+    public List<UserClubs> selectUserClubsByUserIdAndClubId(Integer userId, Integer clubId) {
+        return clubsMapper.selectUserClubsByUserIdAndClubId(userId, clubId);
     }
 }
