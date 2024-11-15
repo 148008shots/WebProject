@@ -1,8 +1,8 @@
 <template>
     <div>
-        <h2>俱乐部管理</h2>
+        <h2>学生社团管理</h2>
         <!-- 添加俱乐部按钮 -->
-        <el-button type="primary" @click="dialogVisible = true">添加俱乐部</el-button>
+      <el-button type="primary" @click="dialogVisible = true">添加社团</el-button>
 
         <!-- 俱乐部列表 -->
         <el-table :data="clubs" style="width: 100%; margin-top: 20px">

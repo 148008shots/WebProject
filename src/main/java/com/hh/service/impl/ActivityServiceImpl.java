@@ -50,6 +50,18 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
+    public PageBean<Activity> getUserActivities(Integer pageNum, Integer pageSize, Integer userId) {
+        PageBean<Activity> pb = new PageBean<>();
+        PageHelper.startPage(pageNum, pageSize);
+        List<Activity> ac = activityMapper.selectActivityByUserId(userId);
+        Page<Activity> p = (Page<Activity>) ac;
+
+        pb.setItems(p.getResult());
+        pb.setTotal(p.getTotal());
+        return pb;
+    }
+
+    @Override
     public void joinActivity(Integer userId, Integer activityId) {
         activityMapper.joinActivity(userId, activityId);
     }

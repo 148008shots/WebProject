@@ -18,6 +18,8 @@ public interface ActivityService {
 
     PageBean<Activity> getAllActivities1(Integer pageNum, Integer pageSize);
 
+    PageBean<Activity> getUserActivities(Integer pageNum, Integer pageSize, Integer userId);
+
     void joinActivity(Integer userId, Integer activityId);
 
     int increaseClubMember(Integer activityId);

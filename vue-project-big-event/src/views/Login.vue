@@ -122,7 +122,7 @@ const clearData = () => {
             <!-- 登录表单 -->
             <el-form ref="form" size="large" autocomplete="off" v-else :model="registerData" :rules="registerDataRules" class="card">
                 <el-form-item class="welcome-title">
-                    <h1>欢迎登陆运动馆预约系统</h1>
+                    <h1>欢迎登陆校园体育场系统</h1>
                 </el-form-item>
                 <el-form-item prop="username">
                     <el-input :prefix-icon="User" placeholder="请输入用户名" v-model="registerData.username"></el-input>

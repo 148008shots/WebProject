@@ -54,28 +54,48 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ElTable, ElTableColumn, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElInputNumber, ElMessageBox, ElMessage } from 'element-plus'
-import { fetchAllEquipments, addEquipment, updateEquipment, deleteEquipment as deleteEquipmentApi, fetchAllBorrowings, addBorrowing, updateBorrowing, deleteBorrowing } from '@/api/equipment.js'
-import { useTokenStore } from '@/stores/token.js'
+import {
+  ElTable,
+  ElTableColumn,
+  ElButton,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElInput,
+  ElInputNumber,
+  ElMessageBox,
+  ElMessage
+} from 'element-plus'
+import {
+  fetchAllEquipments,
+  addEquipment,
+  updateEquipment,
+  deleteEquipment as deleteEquipmentApi,
+  fetchAllBorrowings
+} from '@/api/equipment.js'
+import {useTokenStore} from '@/stores/token.js'
 
 const dialogVisible = ref(false)
 const isEditing = ref(false)
 const currentEquipment = ref({})
 const equipments = ref([])
-const currentBorrowing = ref({})
 const borrowings = ref([])
 const tokenStore = useTokenStore()
-const borrowDialogVisible = ref(false)
+
+// 分页条数据模型
+const pageNum = ref(1)
+const total = ref(20)
+const pageSize = ref(8)
 
 const editEquipment = equipment => {
-    isEditing.value = true
-    currentEquipment.value = { ...equipment }
-    dialogVisible.value = true
+  isEditing.value = true
+  currentEquipment.value = {...equipment}
+  dialogVisible.value = true
 }
 
 const deleteEquipment = async equipment => {
-    // 使用 Element Plus 的 ElMessageBox 来显示确认删除的提示
-    ElMessageBox.confirm('你确认删除该器材信息吗？', '温馨提示', {
+  // 使用 Element Plus 的 ElMessageBox 来显示确认删除的提示
+  ElMessageBox.confirm('你确认删除该器材信息吗？', '温馨提示', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'warning'
@@ -134,8 +154,18 @@ const uploadSuccess1 = async img => {
 // 获取全部器材列表
 const fetchEquipmentsList = async () => {
     try {
-        const response = await fetchAllEquipments()
-        equipments.value = response.data
+      let params = {
+        pageNum: pageNum.value,
+        pageSize: pageSize.value
+      }
+      const response = await fetchAllEquipments(params)
+      equipments.value = response.data.items.map(item => ({
+        coverImg: item.coverImg || '',
+        name: item.name,
+        equipmentCount: item.equipmentCount,
+        location: item.location
+      }))
+      total.value = response.data.total
     } catch (error) {
         console.error('获取器材列表失败:', error)
     }
@@ -149,63 +179,6 @@ const fetchBorrowingsList = async () => {
     } catch (error) {
         console.error('获取借用信息列表失败:', error)
     }
-}
-
-const editBorrowing = borrowing => {
-    isEditing.value = true
-    currentBorrowing.value = { ...borrowing }
-    dialogVisible.value = true
-}
-
-const deleteBorrowing1 = async borrowing => {
-    ElMessageBox.confirm('你确认删除该借用信息吗？', '温馨提示', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'warning'
-    })
-        .then(async () => {
-            try {
-                await deleteBorrowing(borrowing.borrowingId)
-                ElMessage({
-                    type: 'success',
-                    message: '删除成功'
-                })
-                borrowings.value = borrowings.value.filter(b => b.borrowingId !== borrowing.borrowingId)
-            } catch (error) {
-                console.error('删除借用信息失败:', error)
-                ElMessage({
-                    type: 'error',
-                    message: '删除失败，请重试'
-                })
-            }
-        })
-        .catch(() => {
-            ElMessage({
-                type: 'info',
-                message: '取消删除'
-            })
-        })
-}
-
-const saveBorrowing = async () => {
-    if (isEditing.value) {
-        try {
-            await updateBorrowing(currentBorrowing.value)
-            const index = borrowings.value.findIndex(b => b.borrowingId === currentBorrowing.value.borrowingId)
-            borrowings.value[index] = currentBorrowing.value
-        } catch (error) {
-            console.error('更新借用信息失败:', error)
-        }
-    } else {
-        try {
-            await addBorrowing(currentBorrowing.value)
-            borrowings.value.push(currentBorrowing.value)
-        } catch (error) {
-            console.error('添加借用信息失败:', error)
-        }
-    }
-    currentBorrowing.value = {}
-    borrowDialogVisible.value = false
 }
 // 在组件挂载入时获取器材列表
 onMounted(() => {

@@ -61,8 +61,6 @@
             statusTextAndColor(currentEvent.signUpDeadline, currentEvent.startTime, currentEvent.endTime).text
           }}</p>
         <p><strong>已报名人数：</strong>{{ currentEvent.signedUpCount }}</p>
-        <!-- 加入活动的按钮 -->
-        <el-button type="danger" @click="handleConfirmLeave">退出活动</el-button>
       </div>
       <span slot="footer" class="dialog-footer">
                 <el-button @click="detailsDialogVisible = false">关闭</el-button>
@@ -74,19 +72,16 @@
 <script setup>
 import {ref, onMounted} from 'vue'
 import {ElTable, ElTableColumn, ElButton, ElDialog, ElTag, ElMessage, ElMessageBox} from 'element-plus'
-import {getActivityListService, signUpActivityApi} from '@/api/activity.js'
-import {getAllCategories, getCourts} from '@/api/court.js'
+import {getActivityListServiceByUser} from '@/api/activity.js'
 import useUserInfoStore from '@/stores/userInfo'
 
 const currentEvent = ref({})
 // 活动列表数据模型
 const events = ref([])
-// 活动分类模型
-const categories = ref([])
-// 活动场地
-const court = ref([])
 // 显示活动详情数据模型
 const detailsDialogVisible = ref(false)
+// 获取当前浏览器用户信息
+const userInfoStore = useUserInfoStore()
 
 // 分页相关模型
 const pageNum = ref(1)
@@ -133,8 +128,12 @@ const onCurrentChange = num => {
 // 获取所有活动信息
 const fetchActivityList = async () => {
   try {
-    const params = {pageNum: pageNum.value, pageSize: pageSize.value}
-    const response = await getActivityListService(params)
+    const params = {
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      userId: userInfoStore.info.id
+    }
+    const response = await getActivityListServiceByUser(params)
     events.value = response.data.items.map(item => ({
       ...item,
       signedUpCount: item.signedUpCount || 0 // 确保有默认值
@@ -142,25 +141,6 @@ const fetchActivityList = async () => {
     total.value = response.data.total
   } catch (error) {
     console.error('获取活动列表失败:', error)
-  }
-}
-// 获取球场信息
-const fetchCourts = async () => {
-  try {
-    const params = {pageNum: pageNum.value, pageSize: pageSize.value}
-    const result1 = await getCourts(params)
-    court.value = result1.data
-  } catch (error) {
-    console.error('获取场地列表失败:', error)
-  }
-}
-// 获取场地分类
-const fetchCategories = async () => {
-  try {
-    const result = await getAllCategories()
-    categories.value = result.data
-  } catch (error) {
-    console.error('获取活动分类失败:', error)
   }
 }
 
@@ -200,63 +180,9 @@ const formatDate = dateStr => {
   const second = date.getSeconds()
   return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
 }
-// 退出活动处理函数
-const handleConfirmLeave = async () => {
-  // 使用 ElMessageBox 弹出确认对话框
-  await ElMessageBox.confirm('您确定要退出这个活动吗？', '退出活动', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-      .then(async () => {
-        // 用户点击确定后的逻辑
-        if (!currentEvent.value) {
-          console.error('未选择活动')
-          ElMessage.error('请先选择一个活动进行退出')
-          return
-        }
-        // 使用 Pinia 的 useUserInfoStore 来获取用户信息
-        const userInfoStore = useUserInfoStore()
-        // 从用户信息中获取用户ID
-        const userId = userInfoStore.info.id // 这里应该是从用户会话或登录信息中获取的实际用户ID
-
-        try {
-          // 构建参数对象
-          const params = {
-            activityId: currentEvent.value.activityId, // 活动ID
-            userId: userId, // 用户ID
-            operation: 1 // 修改为退出活动的操作码
-          }
-
-          // 调用API服务来处理退出活动逻辑，使用params对象传递参数
-          const response = await signUpActivityApi(params)
-          if (response.code !== 0) {
-            // 如果后端返回的code不是0，即有错误发生，显示后端返回的message
-            ElMessage.error(response.message || '退出活动失败')
-            return
-          }
-          // 处理成功逻辑，例如显示提示信息
-          ElMessage.success(response.message || '退出活动成功')
-          // 可以在这里添加更多的逻辑，比如更新界面状态等
-          detailsDialogVisible.value = false // 关闭对话框
-          fetchActivityList() // 重新获取活动列表以更新状态
-        } catch (error) {
-          console.error('退出活动时发生错误:', error)
-        }
-      })
-      .catch(() => {
-        // 用户点击取消的逻辑
-        ElMessage({
-          type: 'info',
-          message: '已取消退出活动'
-        })
-      })
-}
 
 onMounted(() => {
   fetchActivityList()
-  fetchCourts()
-  fetchCategories()
 })
 </script>
 <style scoped>

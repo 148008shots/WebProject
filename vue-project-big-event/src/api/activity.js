@@ -4,7 +4,10 @@ import request from '@/utils/request.js'
 export const getActivityListService = params => {
     return request.get('/Activity/getAllActivities', {params: params})
 }
-
+// 获取活动列表
+export const getActivityListServiceByUser = params => {
+    return request.get('/Activity/getUserActivities', {params: params})
+}
 // 添加活动
 export const addActivityService = activity => {
     return request.post('/Activity/addActivity', activity)

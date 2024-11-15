@@ -23,8 +23,30 @@ public interface ActivityMapper {
     @Select("SELECT * FROM registrations")
     List<Registration> getAllRegistrations();
 
+    @Select("SELECT " +
+            "r.registration_id, " +
+            "r.user_id, " +
+            "a.activity_id, " +
+            "r.registrations_status, " +
+            "a.name, " +
+            "a.location, " +
+            "a.court_id, " +
+            "a.start_time, " +
+            "a.end_time, " +
+            "a.status, " +
+            "a.signed_up_count, " +
+            "a.sign_up_deadline " +
+            "FROM activities a " +
+            "JOIN registrations r ON a.activity_id = r.activity_id " +
+            "WHERE r.user_id = #{userId}")
+    List<Activity> selectActivityByUserId(Integer userId);
+
     @Select("SELECT * FROM registrations WHERE activity_id = #{activityId} AND user_id = #{userId}")
     List<Registration> selectRegistrationsByUserIdAndActivityId(Integer userId, Integer activityId);
+
+    //    查询记录
+    @Select("SELECT * FROM registrations WHERE user_id = #{userId} AND registrations_status = 0 ")
+    List<Registration> selectRegistrationsByUserId(Integer userId);
 
     @Insert("INSERT INTO registrations (user_id, activity_id) VALUES (#{userId}, #{activityId})")
     void joinActivity(Integer userId, Integer activityId);
@@ -32,6 +54,6 @@ public interface ActivityMapper {
     @Update("UPDATE activities SET signed_up_count = signed_up_count + #{nweMember} WHERE activity_id = #{activityId}")
     int updateActivityMember(Integer nweMember, Integer activityId);
 
-    @Delete("DELETE FROM registrations WHERE activity_id = #{activityId} AND user_id = #{userId}")
+    @Update("UPDATE registrations SET registrations_status = 1 WHERE activity_id = #{activityId} AND user_id = #{userId}")
     void leaveActivity(Integer userId, Integer activityId);
 }

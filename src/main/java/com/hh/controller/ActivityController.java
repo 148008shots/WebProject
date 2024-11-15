@@ -117,4 +117,13 @@ public class ActivityController {
         return new Result<>(resultCode, resultMessage, null);
     }
 
+    @GetMapping("/getUserActivities")
+    public Result<PageBean<Activity>> getActivitiesByUserId(
+            Integer pageNum,
+            Integer pageSize,
+            Integer userId
+    ) {
+        PageBean<Activity> pageBean = activityService.getUserActivities(pageNum, pageSize, userId);
+        return Result.success(pageBean);
+    }
 }
