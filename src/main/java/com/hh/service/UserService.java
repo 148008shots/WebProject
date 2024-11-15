@@ -20,4 +20,14 @@ public interface UserService {
     void updateUser(User user);
 
     void deleteUser(Integer id);
+
+    User findByUserNameAndPhone(String username, String phone);
+
+    void reUpdatePwd(String newPassword, String username);
+
+    void resetUpdatePassword(String username, String newPassword);
 }
+
+
+
+

@@ -46,12 +46,6 @@ public class UserServiceImpl implements UserService {
         userMapper.updateAvatar(avatarUrl,id);
     }
 
-    @Override
-    public void updatePwd(String new_pwd) {
-        Map<String,Object> map = ThreadLocalUtil.get();
-        Integer id = (Integer) map.get("id");
-        userMapper.updatePwd(Md5Util.getMD5String(new_pwd),id);
-    }
 
     @Override
     public List<User> fetchAllUsers() {
@@ -66,5 +60,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Integer id) {
         userMapper.deleteUserByUsername(id);
+    }
+
+    @Override
+    public User findByUserNameAndPhone(String username, String phone) {
+        return userMapper.selectByUserNameAndPhone(username, phone);
+    }
+
+    @Override
+    public void reUpdatePwd(String newPassword, String username) {
+
+    }
+
+    @Override
+    public void updatePwd(String new_pwd) {
+        Map<String, Object> map = ThreadLocalUtil.get();
+        Integer id = (Integer) map.get("id");
+        userMapper.updatePwd(Md5Util.getMD5String(new_pwd), id);
+    }
+
+    @Override
+    public void resetUpdatePassword(String username, String newPassword) {
+        userMapper.resetUpdatePwd(Md5Util.getMD5String(newPassword), username);
     }
 }

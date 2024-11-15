@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -126,10 +127,34 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public Result deleteUser(Integer id){
+    public Result deleteUser(Integer id) {
         System.out.println(id);
         userService.deleteUser(id);
         return Result.success();
+    }
+
+    @PostMapping("/forgetPassword")
+    public Result forgetPassword(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^1[3-9]\\d{9}$") String phone) {
+        User user = userService.findByUserNameAndPhone(username, phone);
+        if (user == null) {
+            return Result.error("用户不存在或手机号不正确");
+        }
+/*        String resetToken = UUID.randomUUID().toString();
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        operations.set("reset:" + resetToken, user.getUsername(), 30, TimeUnit.MINUTES); // 令牌有效期30分钟
+        // 发送重置密码邮件或短信（这里需要实现邮件或短信发送功能）*/
+        return Result.success("重置密码令牌已发送，请查收");
+    }
+
+    @PatchMapping("/resetPassword")
+    public Result resetPassword(@RequestBody Map<String, String> payload) {
+        String username = payload.get("username");
+        String newPassword = payload.get("newPassword");
+        if (username == null || newPassword == null) {
+            return Result.error("参数错误，用户名或新密码为空");
+        }
+        userService.resetUpdatePassword(username, newPassword);
+        return Result.success("密码重置成功");
     }
 }
 
