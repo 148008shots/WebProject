@@ -29,6 +29,7 @@ public class ActivityController {
 
     @PostMapping("/addActivity")
     public Result<String> addActivity(@RequestBody Activity activity) {
+        System.out.println(activity);
         Map<String ,Object> map = ThreadLocalUtil.get();
         int id = (int) map.get("id");
         activity.setOrganizerId(id);

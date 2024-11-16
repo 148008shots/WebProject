@@ -52,33 +52,30 @@
 
     <!-- 添加/编辑活动表单 -->
     <el-dialog :title="isEditing ? '编辑活动' : '添加活动'" v-model="dialogVisible" width="30%">
-      <el-form :model="currentEvent">
-        <el-form-item label="活动名称">
+      <el-form :model="currentEvent" :rules="rules" ref="eventForm">
+        <el-form-item label="活动名称" prop="name">
           <el-input v-model="currentEvent.name" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="活动描述">
+        <el-form-item label="活动描述" prop="description">
           <el-input type="textarea" v-model="currentEvent.description" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="活动体育场">
-          <el-select v-model="currentEvent.courtId" placeholder="请选择">
-            <el-option v-for="c in court" :key="c.courtId" :label="c.courtNumber" :value="c.courtId"></el-option>
+        <el-form-item label="活动类别" prop="courtId">
+          <el-select v-model="currentEvent.categoryId" placeholder="请选择">
+            <el-option v-for="c in categories" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="活动地址">
+        <el-form-item label="活动地址" prop="location">
           <el-input v-model="currentEvent.location" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="开始时间">
-          <el-date-picker v-model="currentEvent.startTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-form-item label="报名截止时间" prop="signUpDeadline">
+          <el-date-picker v-model="currentEvent.signUpDeadline" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
-        <el-form-item label="结束时间">
+        <el-form-item label="开始时间" prop="startTime">
+          <el-date-picker v-model="currentEvent.startTime" type="datetime" placeholder="选择日期时间"
+                          @blur="validateTimes"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="结束时间" prop="endTime">
           <el-date-picker v-model="currentEvent.endTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="currentEvent.status" placeholder="请选择活动状态">
-            <el-option label="待开始" value="待开始"></el-option>
-            <el-option label="进行中" value="进行中"></el-option>
-            <el-option label="已结束" value="已结束"></el-option>
-          </el-select>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -93,7 +90,6 @@
         <p><strong>活动名称：</strong>{{ currentEvent.name }}</p>
         <p><strong>活动描述：</strong>{{ currentEvent.description }}</p>
         <p><strong>地点：</strong>{{ currentEvent.location }}</p>
-
         <p><strong>开始时间：</strong>{{ formatDate(currentEvent.startTime) }}</p>
         <p><strong>结束时间：</strong>{{ formatDate(currentEvent.endTime) }}</p>
         <p><strong>状态：</strong>{{
@@ -143,7 +139,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, reactive, toRefs, watch} from 'vue'
 import {
   ElTable,
   ElTableColumn,
@@ -165,7 +161,7 @@ import {
   deleteActivityService,
   signUpActivityApi
 } from '@/api/activity.js'
-import {getAllCategories, getCourts} from '@/api/court.js'
+import {getAllCategories, getCourts, getAllCourts} from '@/api/court.js'
 import useUserInfoStore from '@/stores/userInfo'
 
 // 发起活动对话框
@@ -173,7 +169,7 @@ const dialogVisible = ref(false)
 // 检查是否为编辑
 const isEditing = ref(false)
 // 发起活动申请的表单模型
-const currentEvent = ref({})
+const currentEvent = reactive({})
 // 活动列表数据模型
 const events = ref([])
 // 活动分类模型
@@ -197,6 +193,7 @@ const confirmDialogVisible = ref(false)
 const pageNum = ref(1)
 const total = ref(20)
 const pageSize = ref(3)
+const eventForm = ref(null)
 
 // 状态和颜色显示函数
 const statusTextAndColor = (signUpDeadline, startTime, endTime) => {
@@ -252,9 +249,13 @@ const fetchActivityList = async () => {
 // 获取球场信息
 const fetchCourts = async () => {
   try {
-    const params = {pageNum: pageNum.value, pageSize: pageSize.value}
-    const result1 = await getCourts(params)
-    court.value = result1.data
+    const result1 = await getAllCourts()
+    // 确保 result1.data.items 存在，并且是一个数组
+    if (result1.data && Array.isArray(result1.data)) {
+      court.value = result1.data
+    } else {
+      console.error('获取的球场数据格式不正确或数据为空')
+    }
   } catch (error) {
     console.error('获取场地列表失败:', error)
   }
@@ -268,27 +269,43 @@ const fetchCategories = async () => {
     console.error('获取活动分类失败:', error)
   }
 }
+
 // 发起活动申请
 const saveEvent = async () => {
-  if (isEditing.value) {
-    try {
-      await updateActivityService(currentEvent.value)
-      const index = events.value.findIndex(e => e.id === currentEvent.value.id)
-      events.value[index] = currentEvent.value
-    } catch (error) {
-      console.error('更新活动失败:', error)
+  try {
+    // 首先进行表单校验
+    const valid = await eventForm.value.validate()
+    if (valid) {
+      // 校验通过，执行活动的添加或更新操作
+      if (isEditing.value) {
+        // 更新活动
+        await updateActivityService(currentEvent.value)
+        const index = events.value.findIndex(e => e.id === currentEvent.value.id)
+        if (index !== -1) {
+          events.value[index] = currentEvent.value
+        }
+      } else {
+        // 添加活动前确保 currentEvent.value 已正确初始化
+        if (currentEvent && Object.keys(currentEvent).length > 0) {
+          console.log('Request body:', currentEvent)
+          await addActivityService(currentEvent)
+          events.value.push(currentEvent.value)
+        } else {
+          console.error('currentEvent.value is empty or not initialized')
+          return
+        }
+      }
+      // 清空表单和对话框
+      currentEvent.value = {}
+      dialogVisible.value = false
+      // 重新获取活动列表
+      fetchActivityList()
+    } else {
+      console.log('表单校验失败')
     }
-  } else {
-    try {
-      await addActivityService(currentEvent.value)
-      events.value.push(currentEvent.value)
-    } catch (error) {
-      console.error('添加活动失败:', error)
-    }
+  } catch (error) {
+    console.error('操作失败:', error)
   }
-  currentEvent.value = {}
-  dialogVisible.value = false
-  fetchActivityList()
 }
 // 日期
 const formatDateRange = (startTime, endTime) => {
@@ -307,6 +324,7 @@ const formatDateRange = (startTime, endTime) => {
 }
 // 展示详情函数
 const showEventDetails = event => {
+  console.log(currentEvent)
   currentEvent.value = event
   detailsDialogVisible.value = true
 }
@@ -374,7 +392,54 @@ const submitSignUpForm = async () => {
     console.error('报名活动时发生错误:', error)
   }
 }
+const rules = reactive({
+  name: [{required: true, message: '请输入活动名称', trigger: 'blur'}],
+  signUpDeadline: [{type: 'date', required: true, message: '请选择报名截止时间', trigger: 'change'}],
+  startTime: [{type: 'date', required: true, message: '请选择活动开始时间', trigger: 'change'}],
+  endTime: [{type: 'date', required: true, message: '请选择活动结束时间', trigger: 'change'}],
+  checkTimes: {
+    validator: (rule, value, callback) => {
+      if (currentEvent.signUpDeadline && currentEvent.startTime && new Date(currentEvent.signUpDeadline) > new Date(currentEvent.startTime)) {
+        callback(new Error('报名截止时间不能早于活动开始时间'))
+      } else if (currentEvent.startTime && currentEvent.endTime && new Date(currentEvent.startTime) > new Date(currentEvent.endTime)) {
+        callback(new Error('活动开始时间不能晚于活动结束时间'))
+      } else {
+        callback()
+      }
+    },
+    trigger: 'change'
+  }
+})
+// 时间校验方法
+const validateTimes = () => {
+  // 检查报名截止时间是否早于活动开始时间
+  if (currentEvent.signUpDeadline && currentEvent.startTime && new Date(currentEvent.signUpDeadline) > new Date(currentEvent.startTime)) {
+    ElMessage.error('报名截止时间不能早于活动开始时间')
+    return false
+  }
+  // 检查活动开始时间是否早于活动结束时间
+  if (currentEvent.startTime && currentEvent.endTime && new Date(currentEvent.startTime) > new Date(currentEvent.endTime)) {
+    ElMessage.error('活动开始时间不能晚于活动结束时间')
+    return false
+  }
+  return true
+}
+// 监听开始时间和结束时间的变化，以便在失焦时进行校验
+watch(
+    () => currentEvent.startTime,
+    () => {
+      validateTimes()
+    },
+    {immediate: false}
+)
 
+watch(
+    () => currentEvent.endTime,
+    () => {
+      validateTimes()
+    },
+    {immediate: false}
+)
 // 确认加入活动
 const confirmSignUp = async () => {
   confirmDialogVisible.value = false
@@ -386,6 +451,7 @@ onMounted(() => {
   fetchCategories()
 })
 </script>
+
 <style scoped>
 .dialog-footer {
   text-align: right;

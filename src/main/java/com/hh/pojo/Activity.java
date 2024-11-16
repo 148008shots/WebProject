@@ -12,7 +12,7 @@ public class Activity {
     private int signedUpCount;
     private String name;
     private String location;
-    private int courtId;
+    private Integer CategoryId;
     private Date startTime;
     private Date endTime;
     private Date signUpDeadline;

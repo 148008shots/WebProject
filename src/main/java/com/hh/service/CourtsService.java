@@ -20,4 +20,5 @@ public interface CourtsService {
     List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId,String date);
 
     void createBooking(Bookings booking);
+
 }

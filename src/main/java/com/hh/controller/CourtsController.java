@@ -15,21 +15,31 @@ public class CourtsController {
     private CourtsService courtsService;
 
     @GetMapping
-    public Result<PageBean<Court>>  listCourts(
+    public Result<PageBean<Court>> listCourts(
             Integer pageNum,
             Integer pageSize,
             @RequestParam(required = false) Integer categoryId,//分类id
             @RequestParam(required = false) String courtName // 场地名称
     ) {
         // 调用服务层方法获取球场信息列表
-        PageBean<Court> pageBean= courtsService.list1(pageNum,pageSize,categoryId,courtName);
+        PageBean<Court> pageBean = courtsService.list1(pageNum, pageSize, categoryId, courtName);
         return Result.success(pageBean);
     }
+
+    @GetMapping("/allCourts")
+    public Result<List<Court>> allCourts(
+    ) {
+        // 调用服务层方法获取球场信息列表
+        List<Court> courtList = courtsService.getAllCourts();
+        return Result.success(courtList);
+    }
+
     @PostMapping
     public Result addCourt(@RequestBody Court court) {
         courtsService.insertCourt(court);
         return Result.success();
     }
+
     @PutMapping
     public Result updateCourt(@RequestBody Court court) {
         courtsService.updateCourt(court);

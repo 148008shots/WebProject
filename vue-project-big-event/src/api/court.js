@@ -1,7 +1,10 @@
 import request from '@/utils/request.js'
 
 export const getCourts = params => {
-    return request.get('/court', { params: params })
+    return request.get('/court', {params: params})
+}
+export const getAllCourts = () => {
+    return request.get('/court/allCourts')
 }
 export const getAllCategories = () => {
     return request.get('/categories')

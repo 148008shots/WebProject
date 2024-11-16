@@ -8,13 +8,13 @@ import java.util.List;
 
 @Mapper
 public interface ActivityMapper {
-    @Insert("INSERT INTO activities (organizer_id, name, location, court_id, start_time, end_time) VALUES (#{organizerId}, #{name}, #{location}, #{courtId}, #{startTime}, #{endTime})")
+    @Insert("INSERT INTO activities (organizer_id, name, location, category_id, start_time, end_time,sign_up_deadline) VALUES (#{organizerId}, #{name}, #{location}, #{categoryId}, #{startTime}, #{endTime},#{signUpDeadline})")
     int insertActivity(Activity activity);
 
     @Delete("DELETE FROM activities WHERE activity_id = #{activityId}")
     int deleteActivityById(int activityId);
 
-    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, court_id = #{courtId}, start_time = #{startTime}, end_time = #{endTime} WHERE activity_id = #{activityId}")
+    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime} WHERE activity_id = #{activityId}")
     int updateActivity(Activity activity);
 
     @Select("SELECT * FROM activities")
@@ -30,7 +30,7 @@ public interface ActivityMapper {
             "r.registrations_status, " +
             "a.name, " +
             "a.location, " +
-            "a.court_id, " +
+            "a.category_id, " +
             "a.start_time, " +
             "a.end_time, " +
             "a.status, " +
