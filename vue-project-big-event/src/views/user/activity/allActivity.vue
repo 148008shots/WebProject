@@ -86,16 +86,16 @@
 
     <!-- 活动详情对话框 -->
     <el-dialog title="活动详情" v-model="detailsDialogVisible" width="30%">
-      <div v-if="currentEvent">
-        <p><strong>活动名称：</strong>{{ currentEvent.name }}</p>
-        <p><strong>活动描述：</strong>{{ currentEvent.description }}</p>
-        <p><strong>地点：</strong>{{ currentEvent.location }}</p>
-        <p><strong>开始时间：</strong>{{ formatDate(currentEvent.startTime) }}</p>
-        <p><strong>结束时间：</strong>{{ formatDate(currentEvent.endTime) }}</p>
+      <div v-if="eventsDetail">
+        <p><strong>活动名称：</strong>{{ eventsDetail.name }}</p>
+        <p><strong>活动描述：</strong>{{ eventsDetail.description }}</p>
+        <p><strong>地点：</strong>{{ eventsDetail.location }}</p>
+        <p><strong>开始时间：</strong>{{ formatDate(eventsDetail.startTime) }}</p>
+        <p><strong>结束时间：</strong>{{ formatDate(eventsDetail.endTime) }}</p>
         <p><strong>状态：</strong>{{
-            statusTextAndColor(currentEvent.signUpDeadline, currentEvent.startTime, currentEvent.endTime).text
+            statusTextAndColor(eventsDetail.signUpDeadline, eventsDetail.startTime, eventsDetail.endTime).text
           }}</p>
-        <p><strong>已报名人数：</strong>{{ currentEvent.signedUpCount }}</p>
+        <p><strong>已报名人数：</strong>{{ eventsDetail.signedUpCount }}</p>
         <!-- 加入活动的按钮 -->
         <el-button type="success" @click="handleConfirmSignUp">加入活动</el-button>
       </div>
@@ -172,6 +172,8 @@ const isEditing = ref(false)
 const currentEvent = reactive({})
 // 活动列表数据模型
 const events = ref([])
+const eventsDetail = ref([])
+
 // 活动分类模型
 const categories = ref([])
 // 活动场地
@@ -192,7 +194,7 @@ const confirmDialogVisible = ref(false)
 // 分页相关模型
 const pageNum = ref(1)
 const total = ref(20)
-const pageSize = ref(3)
+const pageSize = ref(10)
 const eventForm = ref(null)
 
 // 状态和颜色显示函数
@@ -324,8 +326,8 @@ const formatDateRange = (startTime, endTime) => {
 }
 // 展示详情函数
 const showEventDetails = event => {
-  console.log(currentEvent)
-  currentEvent.value = event
+  eventsDetail.value = event
+  console.log(eventsDetail)
   detailsDialogVisible.value = true
 }
 
@@ -344,10 +346,7 @@ const formatDate = dateStr => {
   const second = date.getSeconds()
   return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
 }
-// 显示报名表函数
-const showSignUpForm = () => {
-  signUpDialogVisible.value = true
-}
+
 // 处理确认报名的函数
 const handleConfirmSignUp = () => {
   // 显示确认对话框

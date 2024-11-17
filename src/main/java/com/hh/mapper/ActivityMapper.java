@@ -8,13 +8,13 @@ import java.util.List;
 
 @Mapper
 public interface ActivityMapper {
-    @Insert("INSERT INTO activities (organizer_id, name, location, category_id, start_time, end_time,sign_up_deadline) VALUES (#{organizerId}, #{name}, #{location}, #{categoryId}, #{startTime}, #{endTime},#{signUpDeadline})")
+    @Insert("INSERT INTO activities (organizer_id, name, location, category_id, start_time, end_time,sign_up_deadline,description) VALUES (#{organizerId}, #{name}, #{location}, #{categoryId}, #{startTime}, #{endTime},#{signUpDeadline},#{description})")
     int insertActivity(Activity activity);
 
     @Delete("DELETE FROM activities WHERE activity_id = #{activityId}")
     int deleteActivityById(int activityId);
 
-    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime} WHERE activity_id = #{activityId}")
+    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime},description = #{description} WHERE activity_id = #{activityId}")
     int updateActivity(Activity activity);
 
     @Select("SELECT * FROM activities")
@@ -36,6 +36,7 @@ public interface ActivityMapper {
             "a.status, " +
             "a.signed_up_count, " +
             "a.sign_up_deadline " +
+            "a.description " +
             "FROM activities a " +
             "JOIN registrations r ON a.activity_id = r.activity_id " +
             "WHERE r.user_id = #{userId}")

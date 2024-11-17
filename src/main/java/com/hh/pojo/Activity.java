@@ -12,6 +12,7 @@ public class Activity {
     private int signedUpCount;
     private String name;
     private String location;
+    private String description;
     private Integer CategoryId;
     private Date startTime;
     private Date endTime;
