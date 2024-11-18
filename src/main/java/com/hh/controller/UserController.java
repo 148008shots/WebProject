@@ -34,14 +34,15 @@ public class UserController {
     @PostMapping("/register")
     public Result register(@Pattern(regexp = "^\\S{5,16}$")String username,@Pattern(regexp = "^\\S{5,16}$")String password,@Pattern(regexp = "^1[3-9]\\d{9}$") String phone){
         //查询用户
-        User u =userService.findByUserName(username);
+        User u = userService.findByUserName(username);
+        User uPhone = userService.findByUserPhone(phone);
         //判断用户是否为空
-        if (u == null){
-            userService.register(username,password,phone);
+        if (u == null && uPhone == null) {
+            userService.register(username, password, phone);
             return Result.success();
-        }else {
+        } else {
             //非空不合法，被占用
-            return Result.error("被占用");
+            return Result.error("用户名或手机号被占用");
         }
     }
     @PostMapping("/login")

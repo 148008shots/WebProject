@@ -3,7 +3,6 @@
     <h2>校园活动</h2>
     <!-- 添加活动按钮 -->
     <el-button type="primary" @click="dialogVisible = true">发起活动</el-button>
-
     <!-- 活动列表 -->
     <el-table :data="events" v-if="events.length" style="width: 100%; margin-top: 20px">
       <el-table-column prop="name" label="活动名称" width="180"></el-table-column>
@@ -49,7 +48,6 @@
         @size-change="onSizeChange"
         @current-change="onCurrentChange"
         style="margin-top: 20px; justify-content: flex-end"/>
-
     <!-- 添加/编辑活动表单 -->
     <el-dialog :title="isEditing ? '编辑活动' : '添加活动'" v-model="dialogVisible" width="30%">
       <el-form :model="currentEvent" :rules="rules" ref="eventForm">

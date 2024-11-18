@@ -83,4 +83,10 @@ public class UserServiceImpl implements UserService {
     public void resetUpdatePassword(String username, String newPassword) {
         userMapper.resetUpdatePwd(Md5Util.getMD5String(newPassword), username);
     }
+
+    @Override
+    public User findByUserPhone(String phone) {
+        User u = userMapper.findByUserPhone(phone);
+        return u;
+    }
 }

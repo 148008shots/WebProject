@@ -14,8 +14,9 @@ export const addActivityService = activity => {
 }
 
 // 更新活动
-export const updateActivityService = (activityId, activity) => {
-    return request.put(`/Activity/updateActivity${activityId}`, activity)
+export const updateActivityService = activity => {
+    console.log(activity)
+    return request.put('/Activity/updateActivity', activity)
 }
 
 // 删除活动

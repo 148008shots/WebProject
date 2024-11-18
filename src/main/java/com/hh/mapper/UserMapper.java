@@ -36,4 +36,7 @@ public interface UserMapper {
 
     @Update("update user set password=#{md5String},update_time=now() where username = #{username}")
     void resetUpdatePwd(String md5String, String username);
+
+    @Select("select * from user where phone = #{phone}")
+    User findByUserPhone(String phone);
 }

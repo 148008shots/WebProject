@@ -26,6 +26,8 @@ public interface UserService {
     void reUpdatePwd(String newPassword, String username);
 
     void resetUpdatePassword(String username, String newPassword);
+
+    User findByUserPhone(String phone);
 }
 
 
