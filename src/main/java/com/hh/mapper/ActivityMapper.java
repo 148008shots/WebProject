@@ -14,7 +14,7 @@ public interface ActivityMapper {
     @Delete("DELETE FROM activities WHERE activity_id = #{activityId}")
     int deleteActivityById(int activityId);
 
-    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime},description = #{description} WHERE activity_id = #{activityId}")
+    @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime},description = #{description},sign_up_deadline = #{signUpDeadline} WHERE activity_id = #{activityId}")
     int updateActivity(Activity activity);
 
     @Select("SELECT * FROM activities")
