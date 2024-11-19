@@ -23,14 +23,21 @@ public class ActivityController {
             Integer pageNum,
             Integer pageSize
     ) {
-        PageBean<Activity> pageBean = activityService.getAllActivities1(pageNum,pageSize);
+        PageBean<Activity> pageBean = activityService.getAllActivities1(pageNum, pageSize);
         return Result.success(pageBean);
+    }
+
+    @GetMapping("/getAllActivity")
+    public Result<List<Activity>> getAllActivity(
+    ) {
+        List<Activity> activities = activityService.getAllActivities();
+        return Result.success(activities);
     }
 
     @PostMapping("/addActivity")
     public Result<String> addActivity(@RequestBody Activity activity) {
         System.out.println(activity);
-        Map<String ,Object> map = ThreadLocalUtil.get();
+        Map<String, Object> map = ThreadLocalUtil.get();
         int id = (int) map.get("id");
         activity.setOrganizerId(id);
         int result = activityService.insertActivity(activity);

@@ -8,6 +8,10 @@ export const getActivityListService = params => {
 export const getActivityListServiceByUser = params => {
     return request.get('/Activity/getUserActivities', {params: params})
 }
+// 获取活动列表
+export const getAllActivityApi = () => {
+    return request.get('/Activity/getAllActivity')
+}
 // 添加活动
 export const addActivityService = activity => {
     return request.post('/Activity/addActivity', activity)

@@ -35,7 +35,7 @@ public interface ActivityMapper {
             "a.end_time, " +
             "a.status, " +
             "a.signed_up_count, " +
-            "a.sign_up_deadline " +
+            "a.sign_up_deadline, " +
             "a.description " +
             "FROM activities a " +
             "JOIN registrations r ON a.activity_id = r.activity_id " +

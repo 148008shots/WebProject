@@ -60,7 +60,7 @@ public class CourtsController {
 
     @GetMapping("/timeSlotsByCourtId")
     public Result getTimeByCourtId(Integer courtId,String date){
-        List<TimeSlots> times =courtsService.getAllTimeSlotByCourtId(courtId,date);
+        List<TimeSlots> times = courtsService.getAllTimeSlotByCourtId(courtId, date);
         return Result.success(times);
     }
 
@@ -69,5 +69,13 @@ public class CourtsController {
         System.out.println(booking);
         courtsService.createBooking(booking);
         return Result.success();
+    }
+
+    // 获取当天预约情况的API端点
+    @GetMapping("/today-appointments")
+    public Result getTodayAppointments(@RequestParam("date") String date) {
+        // 调用服务层方法，传入日期参数
+        List<Bookings> appointmentsByDate = courtsService.findAppointmentsByDate(date);
+        return Result.success(appointmentsByDate);
     }
 }

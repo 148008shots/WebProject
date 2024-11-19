@@ -35,3 +35,6 @@ export const getTimeSlotsForVenue = (courtId, date) => {
 export const creatBooking = bookingInfo => {
     return request.post('/court/createBooking', bookingInfo)
 }
+export const getTodayAppointments = date => {
+    return request.get('/court/today-appointments', {params: {date}})
+}

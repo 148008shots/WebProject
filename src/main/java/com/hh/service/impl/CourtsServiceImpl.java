@@ -101,5 +101,15 @@ public class CourtsServiceImpl implements CourtsService {
         courtMapper.insertBooking(booking);
     }
 
+    @Override
+    public List<Bookings> findAppointmentsByDate(String date) {
+        int[] dateParts = TimeForUtil.parseDate1(date);
+        String Year = String.valueOf(dateParts[0]);
+        String Month = String.valueOf(dateParts[1]);
+        String Day = String.valueOf(dateParts[2]);
+
+        return courtMapper.findAppointmentsByDate(Year, Month, Day);
+    }
+
 
 }

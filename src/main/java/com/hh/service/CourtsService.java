@@ -21,4 +21,5 @@ public interface CourtsService {
 
     void createBooking(Bookings booking);
 
+    List<Bookings> findAppointmentsByDate(String date);
 }

@@ -103,7 +103,7 @@ import useUserInfoStore from '@/stores/userInfo'
 // 分页条数据模型
 const pageNum = ref(1)
 const total = ref(20)
-const pageSize = ref(8)
+const pageSize = ref(10)
 const venues = ref([])
 
 //用户搜索时选中的分类id
