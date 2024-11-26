@@ -4,11 +4,18 @@
       <el-row :gutter="20" class="card-container">
         <!-- 校园公告 -->
         <el-col :span="4">
-          <el-card class="card">
+          <el-card class="card" v-if="announcement.title !== '暂无数据'">
             <div slot="header" class="clearfix">
-              <span>学校公告</span>
+              <span>{{ announcement.title }}</span>
             </div>
-            <div>公告内容...</div>
+            <div>{{ announcement.summary }}</div>
+            <el-button type="text" @click="showAnnouncementDialog">更多</el-button>
+          </el-card>
+          <el-card class="card" v-else>
+            <div slot="header" class="clearfix">
+              <span>公告</span>
+            </div>
+            <div>暂无数据</div>
           </el-card>
         </el-col>
         <!-- 场地列表滚动容器 -->
@@ -154,6 +161,13 @@
         </el-col>
       </el-row>
     </el-main>
+    <el-dialog title="公告详情" v-model="dialogVisible" width="30%" @close="dialogVisible = false">
+      <div>
+        <p><strong>标题：</strong>{{ announcement.title }}</p>
+        <p><strong>内容：</strong>{{ announcement.content }}</p>
+        <p><strong>发布时间：</strong>{{ announcement.publishTime }}</p>
+      </div>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -164,12 +178,20 @@ import {getAllCourts, getTodayAppointments} from '@/api/court.js'
 import {fetchAllClubs} from '@/api/clubs'
 import {getAllActivityApi} from '@/api/activity.js'
 import {fetchAllEquipmentsApi} from '@/api/equipment.js'
+import {getAnnouncement} from '@/api/announcement.js'
 import moment from 'moment'
 
 const venues = ref([])
 const currentVenues = ref([])
 const scrollContainer = ref(null)
 const todayAppointments = ref('')
+const dialogVisible = ref(false)
+const announcement = ref({
+  title: '暂无数据',
+  summary: '暂无数据',
+  content: '暂无数据',
+  publishTime: '暂无数据'
+})
 // 所有社团列表模型
 const allClubs = ref([])
 let intervalId = null
@@ -248,12 +270,48 @@ const fetchEquipmentsList = async () => {
     console.error('获取器材列表失败:', error)
   }
 }
+const fetchAnnouncement = async () => {
+  try {
+    const response = await getAnnouncement()
+    if (response.data && Object.keys(response.data).length !== 0) {
+      announcement.value = {
+        title: response.data.title || '暂无数据',
+        summary: response.data.summary || '暂无数据',
+        content: response.data.content || '暂无数据',
+        publishTime: response.data.publishTime || '暂无数据'
+      }
+    } else {
+      // 如果响应数据为空，设置默认的“暂无数据”
+      announcement.value = {
+        title: '暂无数据',
+        summary: '暂无数据',
+        content: '暂无数据',
+        publishTime: '暂无数据'
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching announcement:', error)
+    // 即使发生错误，也设置“暂无数据”
+    announcement.value = {
+      title: '暂无数据',
+      summary: '暂无数据',
+      content: '暂无数据',
+      publishTime: '暂无数据'
+    }
+  }
+}
+
+const showAnnouncementDialog = () => {
+  dialogVisible.value = true
+}
+
 onMounted(() => {
   fetchCourts()
   fetchTodayAppointments()
   fetchAllClubs1()
   fetchActivityList()
   fetchEquipmentsList()
+  fetchAnnouncement()
   nextTick(() => {
     startLooping()
   })

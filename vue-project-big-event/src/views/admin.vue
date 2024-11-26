@@ -77,26 +77,32 @@ const handelCommand = command => {
                 </el-menu-item>
                 <el-menu-item index="/ManageEquipment">
                     <el-icon>
-                        <Management />
+                      <Management/>
                     </el-icon>
-                    <span>体育器材管理</span>
+                  <span>体育器材管理</span>
                 </el-menu-item>
-                <el-menu-item index="/ManageEquipmentBorrowing">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>体育器材借用管理</span>
-                </el-menu-item>
-                <!-- 个人中心 -->
-                <el-sub-menu>
-                    <template #title>
-                        <el-icon>
-                            <UserFilled />
-                        </el-icon>
-                        <span>个人中心</span>
-                    </template>
-                    <el-menu-item index="/admins/info">
-                        <el-icon>
+              <el-menu-item index="/ManageEquipmentBorrowing">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>体育器材借用管理</span>
+              </el-menu-item>
+              <el-menu-item index="/Annoucementvue">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>场地公告内容管理</span>
+              </el-menu-item>
+              <!-- 个人中心 -->
+              <el-sub-menu>
+                <template #title>
+                  <el-icon>
+                    <UserFilled/>
+                  </el-icon>
+                  <span>个人中心</span>
+                </template>
+                <el-menu-item index="/admins/info">
+                  <el-icon>
                             <User />
                         </el-icon>
                         <span>基本资料</span>

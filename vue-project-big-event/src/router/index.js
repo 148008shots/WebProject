@@ -25,7 +25,7 @@ import ManageEquipmentBorrowing from '@/views/admin/ManageEquipmentBorrowing.vue
 import Auth from '@/views/Auth.vue'
 import adminindex from '@/views/admin.vue'
 import userHome from '@/views/userHome.vue'
-
+import Annoucementvue from '@/views/admin/Announcement.vue'
 // 定义路由关系
 const routes = [
     // path: 访问的路径 component: 访问路径展示的组件
@@ -94,6 +94,11 @@ const routes = [
                 path: '/admins/repassword',
                 component: UserResetPasswordVue,
                 name: 'AdminsResetPassword' // 添加路由名称
+            },
+            {
+                path: '/Annoucementvue',
+                component: Annoucementvue,
+                name: 'Annoucementvue' // 添加路由名称
             }
         ],
         beforeEnter: (to, from, next) => {
