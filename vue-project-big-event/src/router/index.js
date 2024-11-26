@@ -13,9 +13,11 @@ import allClubs from '@/views/user/club/all-clubs.vue'
 import joinedClubs from '@/views/user/club/joined-clubs.vue'
 import Equipment from '@/views/user/court/equipment.vue'
 import Fields from '@/views/user/court/fields.vue'
+import MyBorrowingsAndReservationsVue from '@/views/user//court/MyBorrowingsAndReservations.vue'
 import index from '@/views/user/index.vue'
 import allActivity from '@/views/user/activity/allActivity.vue'
 import joinedActivity from '@/views/user/activity/joinedActivity.vue'
+import myActivityVue from '@/views/user/activity/myActivity.vue'
 import ManageUser from '@/views/admin/ManageUser.vue'
 import ManageClub from '@/views/admin/ManageClub.vue'
 import ManageCourt from '@/views/admin/ManageCourt.vue'
@@ -168,6 +170,11 @@ const routes = [
                 name: 'Fields' // 添加路由名称
             },
             {
+                path: '/court/BorrowingsAndReservations',
+                component: MyBorrowingsAndReservationsVue,
+                name: 'BorrowingsAndReservations' // 添加路由名称
+            },
+            {
                 path: '/index',
                 component: index,
                 name: 'Index' // 添加路由名称
@@ -181,6 +188,11 @@ const routes = [
                 path: '/activity/joinedActivity',
                 component: joinedActivity,
                 name: 'joinedActivity' // 添加路由名称
+            },
+            {
+                path: '/activity/myActivity',
+                component: myActivityVue,
+                name: 'myActivity' // 添加路由名称
             }
         ],
         beforeEnter: (to, from, next) => {

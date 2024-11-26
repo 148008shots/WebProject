@@ -99,6 +99,7 @@ import {getCourts, getTimeSlots, getTimeSlotsForVenue, creatBooking, getAllCateg
 import {addDays, format} from 'date-fns'
 import {zhCN} from 'date-fns/locale' // 导入中文语言包
 import useUserInfoStore from '@/stores/userInfo'
+import {useRouter} from 'vue-router' // 引入 useRouter
 
 // 分页条数据模型
 const pageNum = ref(1)
@@ -122,7 +123,7 @@ const visibleDates = ref([])
 const appointTimeArr = ref([])
 
 const times = ref([])
-
+const router = useRouter() // 使用 useRouter
 //格式化时间显示函数
 const formatTime = time => {
   const [hours, minutes] = time.split(':').slice(0, 2)
@@ -160,12 +161,16 @@ const selectDate = dateObj => {
   fetchTimeSlotsForVenue(selectedVenue.value, selectedDate.value) // 查询对应日期的预约情况
 }
 //展示预约时间框
+// 修改 showBookingDialog 方法以包含路由跳转
 const showBookingDialog = async venue => {
+  const venueId = venue.courtId // 获取场地 ID
+  router.push({name: 'Fields', params: {courtId: venueId}}) // 路由跳转
   selectedVenue.value = venue
   selectedDate.value = format(new Date(), 'yyyy-MM-dd') // 默认选择当天日期
   await fetchTimeSlotsForVenue(venue, selectedDate.value) // 获取当天的预约时间段情况
-  bookingDialogVisible.value = true
+  bookingDialogVisible.value = true // 显示预约对话框
 }
+
 // 选择预约时间操作
 const changTime = (item, index) => {
   console.log('Changing time slot:', item, index)

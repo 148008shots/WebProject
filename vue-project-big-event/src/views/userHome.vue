@@ -70,18 +70,19 @@ const handelCommand = command => {
                     </template>
                     <el-menu-item index="/court/fields">校园场地</el-menu-item>
                     <el-menu-item index="/court/equipment">器材借用申请</el-menu-item>
+                    <el-menu-item index="/court/BorrowingsAndReservations">我的预约和借用</el-menu-item>
                 </el-sub-menu>
                 <!-- 俱乐部 -->
-                <el-sub-menu index="2">
-                  <template #title>
-                    <el-icon>
-                      <UserFilled/>
-                    </el-icon>
-                    <span>体育社团</span>
-                  </template>
-                  <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
-                  <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
-                </el-sub-menu>
+              <el-sub-menu index="2">
+                <template #title>
+                  <el-icon>
+                    <UserFilled/>
+                  </el-icon>
+                  <span>体育社团</span>
+                </template>
+                <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
+                <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
+              </el-sub-menu>
               <!-- 活动 -->
               <el-sub-menu index="activity">
                 <template #title>
@@ -92,6 +93,7 @@ const handelCommand = command => {
                 </template>
                 <el-menu-item index="/activity/allActivity">全部活动</el-menu-item>
                 <el-menu-item index="/activity/joinedActivity">我参加的活动</el-menu-item>
+                <el-menu-item index="/activity/myActivity">我发起的活动</el-menu-item>
               </el-sub-menu>
               <!-- 个人中心 -->
               <el-sub-menu index="user">
@@ -103,16 +105,16 @@ const handelCommand = command => {
                 </template>
                 <el-menu-item index="/user/info">
                   <el-icon>
-                            <User />
-                        </el-icon>
-                        <span>基本资料</span>
-                    </el-menu-item>
-                    <el-menu-item index="/user/avatar">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span>更换头像</span>
-                    </el-menu-item>
+                    <User/>
+                  </el-icon>
+                  <span>基本资料</span>
+                </el-menu-item>
+                <el-menu-item index="/user/avatar">
+                  <el-icon>
+                    <Crop/>
+                  </el-icon>
+                  <span>更换头像</span>
+                </el-menu-item>
                     <el-menu-item index="/user/repassword">
                         <el-icon>
                             <EditPen />

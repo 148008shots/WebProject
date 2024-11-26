@@ -1,7 +1,9 @@
 <template>
     <!-- 搜索场地表单-->
     <el-form inline>
-        <el-form-item label="器材名称" style="width: 240px"> <el-input v-model="searchEquipmentName" placeholder="请输入球场名称"></el-input> </el-form-item>
+        <el-form-item label="器材名称" style="width: 240px">
+          <el-input v-model="searchEquipmentName" placeholder="请输入器材名称"></el-input>
+        </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="fetchEquipmentsList">搜索</el-button>
             <el-button @click="searchEquipmentName = ''">重置</el-button>
