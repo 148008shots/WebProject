@@ -64,7 +64,7 @@
               </table>
             </div>
             <div v-else>
-              <p>加载中...</p>
+              <p>今日暂无预约</p>
             </div>
           </el-card>
         </el-col>
@@ -80,8 +80,6 @@
               <table class="activity-table">
                 <thead>
                 <tr>
-                  <th>活动ID</th>
-                  <th>组织者ID</th>
                   <th>名称</th>
                   <th>描述</th>
                   <th>开始时间</th>
@@ -89,13 +87,10 @@
                   <th>报名截止时间</th>
                   <th>报名人数</th>
                   <th>状态</th>
-                  <th>类别ID</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="event in events" :key="event.activityId">
-                  <td>{{ event.activityId }}</td>
-                  <td>{{ event.organizerId }}</td>
                   <td>{{ event.name }}</td>
                   <td>{{ event.description }}</td>
                   <td>{{ event.startTime }}</td>
@@ -103,7 +98,6 @@
                   <td>{{ event.signUpDeadline }}</td>
                   <td>{{ event.signedUpCount }}</td>
                   <td>{{ event.status }}</td>
-                  <td>{{ event.categoryId }}</td>
                 </tr>
                 </tbody>
               </table>
@@ -180,6 +174,7 @@ import {getAllActivityApi} from '@/api/activity.js'
 import {fetchAllEquipmentsApi} from '@/api/equipment.js'
 import {getAnnouncement} from '@/api/announcement.js'
 import moment from 'moment'
+import formatTimestamp from '@/utils/dateUtils.js'
 
 const venues = ref([])
 const currentVenues = ref([])
@@ -250,7 +245,9 @@ const fetchActivityList = async () => {
     const response = await getAllActivityApi()
     events.value = response.data.map(item => ({
       ...item,
-      signedUpCount: item.signedUpCount || 0 // 确保有默认值
+      startTime: formatTimestamp(item.startTime), // 使用 formatTimestamp 格式化开始时间
+      endTime: formatTimestamp(item.endTime), // 使用 formatTimestamp 格式化结束时间
+      signUpDeadline: formatTimestamp(item.signUpDeadline) // 使用 formatTimestamp 格式化报名截止时间
     }))
   } catch (error) {
     console.error('获取活动列表失败:', error)
