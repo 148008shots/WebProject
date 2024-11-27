@@ -57,4 +57,8 @@ public interface ActivityMapper {
 
     @Update("UPDATE registrations SET registrations_status = 1 WHERE activity_id = #{activityId} AND user_id = #{userId}")
     void leaveActivity(Integer userId, Integer activityId);
+
+    //    查找用户创建发活动
+    @Select("SELECT * FROM activities WHERE organizer_id = #{userId}")
+    List<Activity> selectActivityByUserIdCreate(Integer userId);
 }

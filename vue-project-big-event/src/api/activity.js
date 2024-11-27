@@ -1,12 +1,16 @@
 import request from '@/utils/request.js'
 
-// 获取活动列表
+// 分页获取活动列表
 export const getActivityListService = params => {
     return request.get('/Activity/getAllActivities', {params: params})
 }
-// 获取活动列表
+// 获取用户参加的活动
 export const getActivityListServiceByUser = params => {
     return request.get('/Activity/getUserActivities', {params: params})
+}
+// 获取用户创建的活动
+export const getActivityListServiceByUserCreate = async userId => {
+    return request.get(`/Activity/getById/${userId}`)
 }
 // 获取活动列表
 export const getAllActivityApi = () => {

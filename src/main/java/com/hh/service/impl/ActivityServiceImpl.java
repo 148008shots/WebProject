@@ -89,4 +89,9 @@ public class ActivityServiceImpl implements ActivityService {
         return activityMapper.updateActivityMember(-nweMember, activityId);
     }
 
+    @Override
+    public List<Activity> getActivityByUserCreateId(Integer id) {
+        return activityMapper.selectActivityByUserIdCreate(id);
+    }
+
 }

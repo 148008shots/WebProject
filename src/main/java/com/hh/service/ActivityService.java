@@ -30,5 +30,6 @@ public interface ActivityService {
 
     int decreaseClubMember(Integer activityId);
 
+    List<Activity> getActivityByUserCreateId(Integer id);
 }
 

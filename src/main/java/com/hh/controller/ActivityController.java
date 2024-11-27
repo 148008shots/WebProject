@@ -1,9 +1,6 @@
 package com.hh.controller;
 
-import com.hh.pojo.Activity;
-import com.hh.pojo.PageBean;
-import com.hh.pojo.Registration;
-import com.hh.pojo.Result;
+import com.hh.pojo.*;
 import com.hh.service.ActivityService;
 import com.hh.utils.ThreadLocalUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,13 @@ public class ActivityController {
     ) {
         List<Activity> activities = activityService.getAllActivities();
         return Result.success(activities);
+    }
+
+    @GetMapping("/getById/{id}")
+    public Result<List<Activity>> getActivityByUserCreate(@PathVariable Integer id) {
+        List<Activity> activityList = activityService.getActivityByUserCreateId(id);
+        return Result.success(activityList);
+
     }
 
     @PostMapping("/addActivity")
