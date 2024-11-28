@@ -1,11 +1,13 @@
 import request from '@/utils/request.js'
-
+// 分页获取全部场地
 export const getCourts = params => {
     return request.get('/court', {params: params})
 }
+// 获取全部场地列表
 export const getAllCourts = () => {
     return request.get('/court/allCourts')
 }
+// 获取全部的场地分类
 export const getAllCategories = () => {
     return request.get('/categories')
 }
@@ -27,14 +29,11 @@ export const deleteCourt = courtId => {
 export const getTimeSlots = () => {
     return request.get('/court/timeSlots')
 }
-
+// 获取对应场地的预约时间记录
 export const getTimeSlotsForVenue = (courtId, date) => {
     return request.get('/court/timeSlotsByCourtId', { params: { courtId, date } })
 }
-
-export const creatBooking = bookingInfo => {
-    return request.post('/court/createBooking', bookingInfo)
-}
+// 获取当天的预约记录
 export const getTodayAppointments = date => {
     return request.get('/court/today-appointments', {params: {date}})
 }

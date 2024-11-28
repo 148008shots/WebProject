@@ -43,8 +43,19 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { ElTable, ElTableColumn, ElButton, ElDialog, ElForm, ElFormItem, ElSelect, ElOption, ElMessageBox, ElMessage } from 'element-plus'
-import { fetchAllBorrowings, updateBorrowing, updateBorrowingStatus } from '@/api/equipment.js'
+import {
+  ElTable,
+  ElTableColumn,
+  ElButton,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElSelect,
+  ElOption,
+  ElMessageBox,
+  ElMessage
+} from 'element-plus'
+import {fetchAllBorrowings, updateBorrowing, updateBorrowingStatus} from '@/api/Borrowings.js'
 
 const borrowDialogVisible = ref(false)
 const reviewDialogVisible = ref(false)

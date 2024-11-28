@@ -95,7 +95,8 @@
 <script setup>
 import {ref, onMounted, watch} from 'vue'
 import {ElCard, ElPagination, ElDialog, ElButton, ElDatePicker, ElMessage} from 'element-plus'
-import {getCourts, getTimeSlots, getTimeSlotsForVenue, creatBooking, getAllCategories} from '@/api/court.js'
+import {getCourts, getTimeSlots, getTimeSlotsForVenue, getAllCategories} from '@/api/court.js'
+import {creatBooking} from '@/api/booking.js'
 import {addDays, format} from 'date-fns'
 import {zhCN} from 'date-fns/locale' // 导入中文语言包
 import useUserInfoStore from '@/stores/userInfo'

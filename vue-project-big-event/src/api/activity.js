@@ -31,7 +31,7 @@ export const updateActivityService = activity => {
 export const deleteActivityService = activityId => {
     return request.delete(`/Activity/deleteActivity/${activityId}`)
 }
-// 添加活动
+// 加入活动，报名活动
 export const signUpActivityApi = params => {
     const searchParams = new URLSearchParams()
     for (const key in params) {

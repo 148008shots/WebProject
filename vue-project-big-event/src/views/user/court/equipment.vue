@@ -2,7 +2,7 @@
     <!-- 搜索场地表单-->
     <el-form inline>
         <el-form-item label="器材名称" style="width: 240px">
-          <el-input v-model="searchEquipmentName" placeholder="请输入器材名称"></el-input>
+            <el-input v-model="searchEquipmentName" placeholder="请输入器材名称"></el-input>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="fetchEquipmentsList">搜索</el-button>
@@ -48,9 +48,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { ElCard, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElDatePicker, ElInputNumber } from 'element-plus'
-import { fetchAllEquipments, addBorrowing } from '@/api/equipment.js'
+import {ref, onMounted} from 'vue'
+import {ElCard, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElDatePicker, ElInputNumber} from 'element-plus'
+import {fetchAllEquipments} from '@/api/equipment.js'
+import {addBorrowing} from '@/api/Borrowings.js'
 import useUserInfoStore from '@/stores/userInfo'
 
 // 分页条数据模型

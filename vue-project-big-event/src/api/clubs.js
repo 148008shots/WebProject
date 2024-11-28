@@ -1,7 +1,6 @@
 import request from '@/utils/request'
 
-// 获取所有俱乐部
-// 获取所有俱乐部
+// 获取所有社团信息
 export const fetchAllClubs = async () => {
     return request.get('/clubs/getAllClubs').then(response => {
         if (response.code === 0) {
@@ -37,21 +36,6 @@ export const deleteClub = clubId => {
 export const updateClub = club => {
     return request.put('/clubs/updateClub', club)
 }
-export const joinClubApi = params => {
-    // 使用URLSearchParams来构建查询字符串
-    const searchParams = new URLSearchParams()
-    for (const key in params) {
-        searchParams.append(key, params[key])
-    }
-    // 设置Axios请求配置
-    const config = {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    }
-    // 发送PUT请求
-    return request.post('/clubs/joinClub', searchParams, config)
-}
 // 获取当前用户已加入的社团列表
 export const fetchUserClubsApi = async userId => {
     return request.get(`/clubs/fetchUserClubs/${userId}`)
@@ -60,10 +44,11 @@ export const fetchUserClubsApi = async userId => {
 export const fetchUserClubsApi1 = async userId => {
     return request.get(`/clubs/fetchUserClubs1/${userId}`)
 }
-// 更新俱乐部
+// 用户退出俱乐部
 export const leaveClubApi = club => {
     return request.put('/clubs/updateClub', club)
 }
+// 更新用户社团信息,加入或者退出
 export const updateUserClub = params => {
     // 使用URLSearchParams来构建查询字符串
     const searchParams = new URLSearchParams()

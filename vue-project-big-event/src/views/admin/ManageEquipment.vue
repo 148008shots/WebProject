@@ -69,9 +69,9 @@ import {
   fetchAllEquipments,
   addEquipment,
   updateEquipment,
-  deleteEquipment as deleteEquipmentApi,
-  fetchAllBorrowings
+  deleteEquipment as deleteEquipmentApi
 } from '@/api/equipment.js'
+import {fetchAllBorrowings} from '@/api/Borrowings.js'
 import {useTokenStore} from '@/stores/token.js'
 
 const dialogVisible = ref(false)
@@ -105,16 +105,16 @@ const deleteEquipment = async equipment => {
           await deleteEquipmentApi(equipment.equipmentId)
           ElMessage({
             type: 'success',
-                    message: '删除成功'
-                })
-                // 从列表中移除已删除的器材
-                equipments.value = equipments.value.filter(e => e.equipmentId !== equipment.equipmentId)
-            } catch (error) {
-                console.error('删除器材失败:', error)
-                ElMessage({
-                    type: 'error',
-                    message: '删除失败，请重试'
-                })
+            message: '删除成功'
+          })
+          // 从列表中移除已删除的器材
+          equipments.value = equipments.value.filter(e => e.equipmentId !== equipment.equipmentId)
+        } catch (error) {
+          console.error('删除器材失败:', error)
+          ElMessage({
+            type: 'error',
+            message: '删除失败，请重试'
+          })
             }
         })
         .catch(() => {
