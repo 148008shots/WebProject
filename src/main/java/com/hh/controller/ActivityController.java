@@ -35,7 +35,6 @@ public class ActivityController {
     public Result<List<Activity>> getActivityByUserCreate(@PathVariable Integer id) {
         List<Activity> activityList = activityService.getActivityByUserCreateId(id);
         return Result.success(activityList);
-
     }
 
     @PostMapping("/addActivity")

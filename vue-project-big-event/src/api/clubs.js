@@ -38,15 +38,11 @@ export const updateClub = club => {
 }
 // 获取当前用户已加入的社团列表
 export const fetchUserClubsApi = async userId => {
-    return request.get(`/clubs/fetchUserClubs/${userId}`)
+    return request.get(`/userClub/fetchUserClubs/${userId}`)
 }
 // 获取当前用户已加入的社团列表
 export const fetchUserClubsApi1 = async userId => {
-    return request.get(`/clubs/fetchUserClubs1/${userId}`)
-}
-// 用户退出俱乐部
-export const leaveClubApi = club => {
-    return request.put('/clubs/updateClub', club)
+    return request.get(`/userClub/fetchUserClubs1/${userId}`)
 }
 // 更新用户社团信息,加入或者退出
 export const updateUserClub = params => {
@@ -62,5 +58,5 @@ export const updateUserClub = params => {
         }
     }
     // 发送PUT请求
-    return request.post('/clubs/updateUserClub', searchParams, config)
+    return request.post('/userClub/updateUserClub', searchParams, config)
 }
