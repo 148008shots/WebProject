@@ -8,6 +8,11 @@
       <el-table-column prop="name" label="活动名称" width="180"></el-table-column>
       <el-table-column prop="description" label="活动简述" width="300"></el-table-column>
       <el-table-column prop="location" label="地点" width="180"></el-table-column>
+      <el-table-column label="活动图片" width="120">
+        <template #default="scope">
+          <img v-if="scope.row.activityPic" :src="scope.row.activityPic" alt="活动图片" style="width: 100px; height: auto"/>
+        </template>
+      </el-table-column>
       <el-table-column prop="signUpDeadline" label="报名截至时间" width="180">
         <template #default="scope">
           <span v-if="scope.row.signUpDeadline">{{ formatDate(scope.row.signUpDeadline) }}</span>
@@ -75,9 +80,17 @@
         <el-form-item label="结束时间" prop="endTime">
           <el-date-picker v-model="currentEvent.endTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
         </el-form-item>
+        <el-form-item label="活动图片" prop="activityPic">
+          <el-upload ref="uploadRef" class="avatar-uploader" :show-file-list="false" :auto-upload="true"
+                     action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }"
+                     :on-success="uploadSuccess" v-model="currentEvent.activityPic">
+            <img v-if="currentEvent.activityPic" :src="currentEvent.activityPic" class="avatar"/>
+            <img v-else src="@/assets/avatar.jpg" width="278"/>
+          </el-upload>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogVisible = false">取消</el-button>
+                <el-button @click="resetEventForm()">取消</el-button>
                 <el-button type="primary" @click="saveEvent">确定</el-button>
             </span>
     </el-dialog>
@@ -152,16 +165,12 @@ import {
   ElOption,
   ElMessage
 } from 'element-plus'
-import {
-  getActivityListService,
-  addActivityService,
-  updateActivityService,
-  deleteActivityService,
-  signUpActivityApi
-} from '@/api/activity.js'
-import {getAllCategories, getCourts, getAllCourts} from '@/api/court.js'
+import {getActivityListService, addActivityService, updateActivityService, signUpActivityApi} from '@/api/activity.js'
+import {getAllCategories, getAllCourts} from '@/api/court.js'
 import useUserInfoStore from '@/stores/userInfo'
+import {useTokenStore} from '@/stores/token.js'
 
+const tokenStore = useTokenStore()
 // 发起活动对话框
 const dialogVisible = ref(false)
 // 检查是否为编辑
@@ -222,6 +231,24 @@ const statusTextAndColor = (signUpDeadline, startTime, endTime) => {
   // 如果活动已经开始但尚未结束
   return {text: '进行中', color: '#E6A23C'} // 橙色
 }
+//图片上传成功
+const uploadSuccess = async img => {
+  //img就是后台响应的数据，格式为：{code:状态码，message：提示信息，data: 图片的存储地址}
+  currentEvent.activityPic = img.data
+}
+const resetEventForm = () => {
+  // 重置 currentEvent 为一个空对象或者具有默认值的对象
+  currentEvent.name = ''
+  currentEvent.description = ''
+  currentEvent.categoryId = null
+  currentEvent.location = ''
+  currentEvent.signUpDeadline = ''
+  currentEvent.startTime = ''
+  currentEvent.endTime = ''
+  currentEvent.activityPic = '' // 确保图片URL也被清空
+  dialogVisible.value = false
+}
+
 // 分页大小变化
 const onSizeChange = size => {
   pageSize.value = size
@@ -466,5 +493,13 @@ onMounted(() => {
 
 .el-button {
   margin: 0 5px;
+}
+
+.avatar {
+  width: 100px; /* 根据需要调整宽度 */
+  height: auto; /* 高度自动，以保持图片比例 */
+  object-fit: cover; /* 确保图片覆盖整个区域，同时保持比例 */
+  border-radius: 50%; /* 如果需要圆形图片 */
+  border: 2px solid #ebeef5; /* 可选：添加边框 */
 }
 </style>

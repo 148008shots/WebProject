@@ -24,8 +24,8 @@ public interface EquipmentMapper {
     int updateEquipment(Equipment equipment);
 
     // 增加借出记录
-    @Insert("INSERT INTO `equipmentborrowings` (`equipment_id`, `user_id`, `borrow_time`, `return_time`) " +
-            "VALUES (#{equipmentId}, #{userId}, #{borrowTime}, #{returnTime})")
+    @Insert("INSERT INTO `equipmentborrowings` (`equipment_id`, `user_id`, `borrow_time`, `return_time`, `borrow_quantity`) " +
+            "VALUES (#{equipmentId}, #{userId}, #{borrowTime}, #{returnTime}, #{borrowQuantity})")
     int addBorrowing(EquipmentBorrowing borrowing);
 
     // 根据ID删除借出记录

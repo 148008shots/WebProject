@@ -60,19 +60,28 @@ const handelCommand = command => {
                     </el-icon>
                     <span>首页</span>
                 </el-menu-item>
-                <!-- 球馆 -->
-                <el-sub-menu index="courts">
-                    <template #title>
-                        <el-icon>
-                            <Promotion />
-                        </el-icon>
-                        <span>球场</span>
-                    </template>
-                    <el-menu-item index="/court/fields">校园场地</el-menu-item>
-                    <el-menu-item index="/court/equipment">器材借用申请</el-menu-item>
-                    <el-menu-item index="/court/BorrowingsAndReservations">我的预约和借用</el-menu-item>
-                </el-sub-menu>
-                <!-- 俱乐部 -->
+              <!-- 球馆 -->
+              <el-sub-menu index="courts">
+                <template #title>
+                  <el-icon>
+                    <Promotion/>
+                  </el-icon>
+                  <span>球场</span>
+                </template>
+                <el-menu-item index="/court/fields">校园场地</el-menu-item>
+                <el-menu-item index="/court/reservations">我的预约</el-menu-item>
+              </el-sub-menu>
+              <el-sub-menu index="equipment">
+                <template #title>
+                  <el-icon>
+                    <Promotion/>
+                  </el-icon>
+                  <span>器材</span>
+                </template>
+                <el-menu-item index="/Equipment">器材借用申请</el-menu-item>
+                <el-menu-item index="/equipment/equipmentBorrow">我的借用</el-menu-item>
+              </el-sub-menu>
+              <!-- 俱乐部 -->
               <el-sub-menu index="2">
                 <template #title>
                   <el-icon>
@@ -115,16 +124,16 @@ const handelCommand = command => {
                   </el-icon>
                   <span>更换头像</span>
                 </el-menu-item>
-                    <el-menu-item index="/user/repassword">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span>重置密码</span>
-                    </el-menu-item>
-                </el-sub-menu>
-                <!-- 文章分类 -->
-                <el-menu-item index="/article/category">
-                    <el-icon>
+                <el-menu-item index="/user/repassword">
+                  <el-icon>
+                    <EditPen/>
+                  </el-icon>
+                  <span>重置密码</span>
+                </el-menu-item>
+              </el-sub-menu>
+              <!-- 文章分类 -->
+              <el-menu-item index="/article/category">
+                <el-icon>
                         <Management />
                     </el-icon>
                     <span>文章分类</span>

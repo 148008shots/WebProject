@@ -11,9 +11,10 @@ import UserInfoVue from '@/views/user/UserInfo.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
 import allClubs from '@/views/user/club/all-clubs.vue'
 import joinedClubs from '@/views/user/club/joined-clubs.vue'
-import Equipment from '@/views/user/court/equipment.vue'
+import Equipment from '@/views/user/equipment/equipment.vue'
+import equipmentBorrow from '@/views/user/equipment/equipmentBorrow.vue'
 import Fields from '@/views/user/court/fields.vue'
-import MyBorrowingsAndReservationsVue from '@/views/user//court/MyBorrowingsAndReservations.vue'
+import reservations from '@/views/user/court/reservations.vue'
 import index from '@/views/user/index.vue'
 import allActivity from '@/views/user/activity/allActivity.vue'
 import joinedActivity from '@/views/user/activity/joinedActivity.vue'
@@ -160,7 +161,7 @@ const routes = [
                 name: 'JoinedClubs' // 添加路由名称
             },
             {
-                path: '/court/Equipment',
+                path: '/Equipment',
                 component: Equipment,
                 name: 'Equipment' // 添加路由名称
             },
@@ -170,9 +171,14 @@ const routes = [
                 name: 'Fields' // 添加路由名称
             },
             {
-                path: '/court/BorrowingsAndReservations',
-                component: MyBorrowingsAndReservationsVue,
-                name: 'BorrowingsAndReservations' // 添加路由名称
+                path: '/court/reservations',
+                component: reservations,
+                name: 'reservations' // 添加路由名称
+            },
+            {
+                path: '/equipment/equipmentBorrow',
+                component: equipmentBorrow,
+                name: 'equipmentBorrow' // 添加路由名称
             },
             {
                 path: '/index',

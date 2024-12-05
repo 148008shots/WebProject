@@ -48,33 +48,6 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
-    public List<EquipmentBorrowing> getAllEquipmentBorrowings() {
-        return equipmentMapper.findAllWithUserInfoAndEquipmentInfo();
-    }
-
-    @Override
-    public boolean addEquipmentBorrowing(EquipmentBorrowing borrowing) {
-        return equipmentMapper.addBorrowing(borrowing) > 0;
-    }
-
-    @Override
-    public boolean deleteEquipmentBorrowingById(int borrowingId) {
-        return equipmentMapper.deleteBorrowingById(borrowingId) > 0;
-    }
-
-    @Override
-    public boolean updateEquipmentBorrowing(EquipmentBorrowing borrowing) {
-        return equipmentMapper.updateBorrowing(borrowing) > 0;
-    }
-
-    @Override
-    public boolean updateBorrowingStatus(Integer borrowingId, Integer newStatus) {
-
-        int result = equipmentMapper.updateBorrowStatus(borrowingId, newStatus);
-        return result > 0;
-    }
-
-    @Override
     public PageBean<Equipment> equipmentList(Integer pageNum, Integer pageSize, String searchEquipmentName) {
         PageBean<Equipment> pb= new PageBean<>();
         PageHelper.startPage(pageNum,pageSize);
@@ -85,14 +58,5 @@ public class EquipmentServiceImpl implements EquipmentService {
         pb.setItems(p.getResult());
         pb.setTotal(p.getTotal());
         return pb;
-    }
-    public boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity) {
-        // 减少器材数量的逻辑
-        return equipmentMapper.updateEquipmentQuantity(equipmentId, -borrowQuantity);
-    }
-
-    public boolean increaseEquipmentQuantity(Integer equipmentId, Integer addQuantity) {
-        // 增加器材数量的逻辑
-        return equipmentMapper.updateEquipmentQuantity(equipmentId, addQuantity);
     }
 }

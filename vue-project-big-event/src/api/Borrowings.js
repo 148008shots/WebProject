@@ -5,19 +5,19 @@ export const fetchBorrowingsApi = async userId => {
 }
 // 获取全部器材借用记录
 export const fetchAllBorrowings = () => {
-    return request.get('/equipment/getAllBorrowings')
+    return request.get('/Borrowing/getAllBorrowings')
 }
 // 申请借用
 export const addBorrowing = borrowing => {
-    return request.post('/equipment/addBorrowing', borrowing)
+    return request.post('/Borrowing/addBorrowing', borrowing)
 }
 // 删除借用记录
 export const deleteBorrowing = borrowingId => {
-    return request.delete(`/equipment/deleteBorrowing/${borrowingId}`)
+    return request.delete(`/Borrowing/deleteBorrowing/${borrowingId}`)
 }
 // 更新借用信息
 export const updateBorrowing = borrowing => {
-    return request.put('/equipment/updateBorrowing', borrowing)
+    return request.put('/Borrowing/updateBorrowing', borrowing)
 }
 // 更新借用信息的状态
 export const updateBorrowingStatus = params => {
@@ -35,5 +35,5 @@ export const updateBorrowingStatus = params => {
     }
 
     // 发送PUT请求
-    return request.put('/equipment/updateBorrowing1', searchParams, config)
+    return request.put('/Borrowing/updateBorrowing1', searchParams, config)
 }

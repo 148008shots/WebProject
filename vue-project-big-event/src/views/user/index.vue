@@ -16,59 +16,25 @@
         </el-col>
         <!-- 场地列表滚动容器 -->
         <el-col :span="20">
-          <div class="scroll-container" ref="scrollContainer">
+          <div class="venue-background-container">
             <div class="venue-title-wrap">
               <span class="venue-title">校园场地</span>
             </div>
-            <el-card v-for="(venue, index) in currentVenues" :key="venue.courtId" class="card-item" shadow="hover"
-                     @click="handleVenueClick(venue)">
-              <div class="card-content">
-                <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="cover-img"/>
-                <span v-else>无图片</span>
-                <div>场地编号: {{ venue.courtId }}</div>
-                <div>场地名称: {{ venue.courtNumber }}</div>
-                <div>位置: {{ venue.location }}</div>
-              </div>
-            </el-card>
+            <div class="venue-cards-wrapper">
+              <el-card v-for="(venue, index) in currentVenues" :key="venue.courtId" class="venue-card" shadow="hover"
+                       @click="handleVenueClick(venue)">
+                <div class="venue-card-content">
+                  <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="venue-cover-img"/>
+                  <span v-else>无图片</span>
+                  <div>场地编号: {{ venue.courtId }}</div>
+                  <div>场地名称: {{ venue.courtNumber }}</div>
+                  <div>位置: {{ venue.location }}</div>
+                </div>
+              </el-card>
+            </div>
           </div>
         </el-col>
       </el-row>
-      <!-- 场地预约情况 -->
-      <!-- <el-row :gutter="20" class="card-container">
-          <el-col :span="24">
-              <el-card class="card">
-                  <div slot="header" class="clearfix">
-                      <span>当天预约情况</span>
-                      <router-link to="/court/Fields">预约详情</router-link>
-                  </div>
-                  <div v-if="todayAppointments.length > 0">
-                      <table class="appointment-table">
-                          <thead>
-                              <tr>
-                                  <th>场地编号</th>
-                                  <th>用户ID</th>
-                                  <th>开始时间</th>
-                                  <th>结束时间</th>
-                                  <th>创建时间</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              <tr v-for="appointment in todayAppointments" :key="appointment.bookingId">
-                                  <td>{{ appointment.courtId }}</td>
-                                  <td>{{ appointment.userId }}</td>
-                                  <td>{{ appointment.startTime }}</td>
-                                  <td>{{ appointment.endTime }}</td>
-                                  <td>{{ appointment.createdAt }}</td>
-                              </tr>
-                          </tbody>
-                      </table>
-                  </div>
-                  <div v-else>
-                      <p>今日暂无预约</p>
-                  </div>
-              </el-card>
-          </el-col>
-      </el-row> -->
       <!-- 近期活动 -->
       <el-row :gutter="20" class="card-container">
         <el-col :span="24">
@@ -84,6 +50,7 @@
                 <tr>
                   <th>名称</th>
                   <th>描述</th>
+                  <th>活动图片</th>
                   <th>开始时间</th>
                   <th>结束时间</th>
                   <th>报名截止时间</th>
@@ -95,6 +62,7 @@
                 <tr v-for="event in events" :key="event.activityId">
                   <td>{{ event.name }}</td>
                   <td>{{ event.description }}</td>
+                  <td><img :src="event.activityPic" alt="活动图片" class="activity-image"/></td>
                   <td>{{ event.startTime }}</td>
                   <td>{{ event.endTime }}</td>
                   <td>{{ event.signUpDeadline }}</td>
@@ -170,16 +138,16 @@
 </template>
 
 <script setup>
-import {ref, onMounted, nextTick} from 'vue'
+import {ref, onMounted, onUnmounted, nextTick} from 'vue'
 import {ElContainer, ElMain, ElRow, ElCol, ElCard} from 'element-plus'
-import {getAllCourts, getTodayAppointments} from '@/api/court.js'
+import {getAllCourts} from '@/api/court.js'
 import {fetchAllClubs} from '@/api/clubs'
 import {getAllActivityApi} from '@/api/activity.js'
 import {fetchAllEquipmentsApi} from '@/api/equipment.js'
 import {getAnnouncement, getAllAnnouncementApi} from '@/api/announcement.js'
 import moment from 'moment'
 import formatTimestamp from '@/utils/dateUtils.js'
-import {useRouter} from 'vue-router' // 引入 useRouter
+import {useRouter} from 'vue-router'
 
 const venues = ref([])
 const currentVenues = ref([])
@@ -192,24 +160,21 @@ const announcement = ref({
   content: '暂无数据',
   publishTime: '暂无数据'
 })
-// 所有社团列表模型
 const allClubs = ref([])
 let intervalId = null
-// 活动列表数据模型
 const events = ref([])
-// 获取场地列表// 器材列表数据模型
 const equipmentList = ref([])
-const router = useRouter() // 使用 useRouter
-const bookingDialogVisible = ref(false) // 控制预约对话框的显示
+const router = useRouter()
+const bookingDialogVisible = ref(false)
 // 处理卡片点击事件
 const handleVenueClick = venue => {
   navigateToVenue(venue)
-  bookingDialogVisible.value = true // 显示预约对话框
+  bookingDialogVisible.value = true
 }
-// 路由跳转方法
+
 const navigateToVenue = venue => {
   const venueId = venue.courtId
-  router.push({name: 'Fields', params: {courtId: venueId}}) // 路由跳转
+  router.push({name: 'Fields', params: {courtId: venueId}})
 }
 const fetchCourts = async () => {
   try {
@@ -221,34 +186,18 @@ const fetchCourts = async () => {
       location: item.location,
       coverImg: item.coverImg || ''
     }))
-    currentVenues.value = venues.value.slice() // 创建一个副本用于显示
+    currentVenues.value = getRandomVenues(5) // 随机获取5个场地
   } catch (error) {
     console.error('Error fetching courts:', error)
   }
 }
 // 更新场地信息以实现循环播报
 const updateVenues = () => {
-  if (currentVenues.value.length > 0) {
-    currentVenues.value.push(currentVenues.value.shift()) // 将第一个元素移动到数组末尾
-  }
+  currentVenues.value = getRandomVenues(5) // 随机获取5个场地
 }
 // 开始循环播报
 const startLooping = () => {
-  intervalId = setInterval(updateVenues, 3000) // 每3秒更新一次，可以根据需要调整
-}
-// 获取当天预约情况
-const fetchTodayAppointments = async () => {
-  try {
-    const currentDate = moment().format('YYYY-MM-DD') // 获取当前日期
-    const response = await getTodayAppointments(currentDate)
-    todayAppointments.value = response.data.map(item => ({
-      ...item,
-      startTime: moment(item.startTime, 'HH:mm:ss').format('LT'), // 格式化时间
-      endTime: moment(item.endTime, 'HH:mm:ss').format('LT') // 格式化时间
-    }))
-  } catch (error) {
-    console.error('Failed to fetch today appointments:', error)
-  }
+  intervalId = setInterval(updateVenues, 5000) // 每5秒更新一次
 }
 // 获取所有社团列表
 const fetchAllClubs1 = async () => {
@@ -318,10 +267,13 @@ const fetchAnnouncement = async () => {
 const showAnnouncementDialog = () => {
   dialogVisible.value = true
 }
+const getRandomVenues = count => {
+  const shuffled = venues.value.sort(() => 0.5 - Math.random()) // 随机打乱数组
+  return shuffled.slice(0, count) // 返回前count个元素
+}
 
 onMounted(() => {
   fetchCourts()
-  fetchTodayAppointments()
   fetchAllClubs1()
   fetchActivityList()
   fetchEquipmentsList()
@@ -333,16 +285,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 公告部分样式 */
 .announcement-container {
   background-color: #f9f9f9;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex; /* 使用 Flexbox */
-  flex-direction: column; /* 垂直排列内容 */
-  justify-content: space-between; /* 分散对齐 */
-  height: 250px; /* 设置固定高度 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 310px; /* 设置固定高度与场地部分一致 */
 }
 
 .announcement-title {
@@ -359,7 +312,7 @@ onMounted(() => {
   background-color: #ffffff;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  flex-grow: 1; /* 允许公告内容增长以填充剩余空间 */
+  flex-grow: 1;
 }
 
 .announcement-header {
@@ -377,30 +330,35 @@ onMounted(() => {
   margin-top: 10px;
 }
 
-.card-container {
+/* 场地部分样式 */
+.venue-background-container {
+  background-color: #f3f3f3;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.venue-cards-wrapper {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
-.scroll-container {
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.card-item {
-  display: inline-block;
-  margin-right: 10px;
-  width: 200px;
-  height: 250px; /* 确保卡片高度一致 */
+.venue-card {
+  flex: 0 0 calc(20% - 10px);
+  margin-bottom: 10px;
+  height: 250px;
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   overflow: hidden;
 }
 
-.card-content {
+.venue-card-content {
   padding: 10px;
 }
 
-.cover-img {
+.venue-cover-img {
   width: 100%;
   height: 120px;
   object-fit: cover;
@@ -446,6 +404,12 @@ onMounted(() => {
 
 .activity-table td {
   color: #606266; /* 单元格字体颜色 */
+}
+
+.activity-image {
+  max-width: 100px; /* 限制图片的最大宽度 */
+  height: auto; /* 保持图片的原始宽高比 */
+  margin-right: 10px; /* 图片与文本之间的间距 */
 }
 
 .el-card {
