@@ -1,7 +1,7 @@
 import request from '@/utils/request.js'
 // 获取用户借用记录
 export const fetchBorrowingsApi = async userId => {
-    return request.get(`/Borrowing/getById/${userId}`) // 确保路径与后端匹配
+    return request.get(`/Borrowing/getByUid/${userId}`) // 确保路径与后端匹配
 }
 // 获取全部器材借用记录
 export const fetchAllBorrowings = () => {

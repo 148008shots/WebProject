@@ -2,18 +2,6 @@
   <el-container>
     <el-main class="main">
       <el-row :gutter="20" class="card-container">
-        <!-- 校园公告 -->
-        <el-col :span="4">
-          <div class="announcement-container">
-            <div class="announcement-title">校园公告</div>
-            <div v-if="announcement.length === 0">暂无公告</div>
-            <div class="announcement" v-for="(announcementItem, index) in announcement" :key="index">
-              <div class="announcement-header">{{ announcementItem.title }}</div>
-              <div class="announcement-summary">{{ announcementItem.summary }}</div>
-              <el-button @click="showAnnouncementDialog(announcementItem)">更多</el-button>
-            </div>
-          </div>
-        </el-col>
         <!-- 场地列表滚动容器 -->
         <el-col :span="20">
           <div class="venue-background-container">
@@ -34,14 +22,25 @@
             </div>
           </div>
         </el-col>
+        <!-- 校园公告 -->
+        <el-col :span="4">
+          <div class="announcement-container">
+            <div class="announcement-title">校园公告</div>
+            <div v-if="announcement.length === 0">暂无公告</div>
+            <div v-for="(announcementItem, index) in announcement" :key="index" class="announcement"
+                 @click="showAnnouncementDialog(announcementItem)">
+              <div class="announcement-header">{{ announcementItem.title }}</div>
+              <div class="announcement-summary">{{ announcementItem.summary }}</div>
+            </div>
+          </div>
+        </el-col>
       </el-row>
       <!-- 近期活动 -->
       <el-row :gutter="20" class="card-container">
         <el-col :span="24">
           <el-card class="card">
             <div slot="header" class="clearfix">
-              <span>近期活动</span>
-              <span>活动详情</span>
+              <span>近期校园活动</span>
               <router-link to="/activity/allActivity">活动详情</router-link>
             </div>
             <div v-if="events.length > 0">
@@ -54,7 +53,7 @@
                   <th>开始时间</th>
                   <th>结束时间</th>
                   <th>报名截止时间</th>
-                  <th>报名人数</th>
+                  <th>参加人数</th>
                   <th>状态</th>
                 </tr>
                 </thead>
@@ -67,7 +66,7 @@
                   <td>{{ event.endTime }}</td>
                   <td>{{ event.signUpDeadline }}</td>
                   <td>{{ event.signedUpCount }}</td>
-                  <td>{{ event.status }}</td>
+                  <td>{{ getStatusByDate(event) }}</td>
                 </tr>
                 </tbody>
               </table>
@@ -83,18 +82,16 @@
         <el-col :span="24">
           <el-card class="card">
             <div slot="header" class="clearfix">
-              <span>社团信息</span>
+              <span>校园社团</span>
               <router-link to="/club/allClubs">社团详情</router-link>
             </div>
             <div v-if="allClubs.length > 0">
               <div class="club-list">
-                <div v-for="club in allClubs" :key="club.clubId" class="club-item">
+                <div v-for="club in allClubs" :key="club.clubId" class="club-item" @click="handleClubClick(club)">
                   <img :src="club.clubsPic" alt="社团图片" class="club-image"/>
                   <h3>{{ club.name }}</h3>
                   <p>{{ club.description }}</p>
                   <p><strong>地址:</strong> {{ club.address }}</p>
-                  <p><strong>成员数量:</strong> {{ club.members }}</p>
-                  <!-- 根据需要添加更多社团信息 -->
                 </div>
               </div>
             </div>
@@ -109,15 +106,15 @@
         <el-col :span="24">
           <el-card class="card">
             <div slot="header" class="clearfix">
-              <span>器材借用情况显示</span>
+              <span>校园体育器材</span>
               <router-link to="/court/Equipment">器材详情</router-link>
             </div>
-            <div v-if="equipmentList.length > 0" class="equipment-list">
-              <div v-for="equipment in equipmentList" :key="equipment.equipmentId" class="equipment-item">
+            <div v-if="randomSixEquipments.length > 0" class="equipment-list">
+              <div v-for="equipment in randomSixEquipments" :key="equipment.equipmentId" class="equipment-item"
+                   @click="handleEquipmentClick(equipment)">
                 <img :src="equipment.coverImg" alt="器材图片" class="equipment-image"/>
                 <h3>{{ equipment.name }}</h3>
-                <p>数量: {{ equipment.equipmentCount }}</p>
-                <p>位置: {{ equipment.location }}</p>
+                <p>剩余: {{ equipment.equipmentCount }}</p>
               </div>
             </div>
             <div v-else>
@@ -129,30 +126,28 @@
     </el-main>
     <el-dialog title="公告详情" v-model="dialogVisible" width="30%" @close="dialogVisible = false">
       <div>
-        <p><strong>标题：</strong>{{ announcement.title }}</p>
-        <p><strong>内容：</strong>{{ announcement.content }}</p>
-        <p><strong>发布时间：</strong>{{ announcement.publishTime }}</p>
+        <p><strong>标题：</strong>{{ currentAnnouncement.title }}</p>
+        <p><strong>内容：</strong>{{ currentAnnouncement.content }}</p>
+        <p><strong>发布时间：</strong>{{ currentAnnouncement.publishTime }}</p>
       </div>
     </el-dialog>
   </el-container>
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted, nextTick} from 'vue'
+import {ref, onMounted, nextTick, computed} from 'vue'
+import moment from 'moment'
 import {ElContainer, ElMain, ElRow, ElCol, ElCard} from 'element-plus'
 import {getAllCourts} from '@/api/court.js'
 import {fetchAllClubs} from '@/api/clubs'
 import {getAllActivityApi} from '@/api/activity.js'
 import {fetchAllEquipmentsApi} from '@/api/equipment.js'
-import {getAnnouncement, getAllAnnouncementApi} from '@/api/announcement.js'
-import moment from 'moment'
+import {getAllAnnouncementApi} from '@/api/announcement.js'
 import formatTimestamp from '@/utils/dateUtils.js'
 import {useRouter} from 'vue-router'
 
 const venues = ref([])
 const currentVenues = ref([])
-const scrollContainer = ref(null)
-const todayAppointments = ref('')
 const dialogVisible = ref(false)
 const announcement = ref({
   title: '暂无数据',
@@ -160,6 +155,7 @@ const announcement = ref({
   content: '暂无数据',
   publishTime: '暂无数据'
 })
+const currentAnnouncement = ref({})
 const allClubs = ref([])
 let intervalId = null
 const events = ref([])
@@ -171,7 +167,12 @@ const handleVenueClick = venue => {
   navigateToVenue(venue)
   bookingDialogVisible.value = true
 }
-
+const handleEquipmentClick = equipment => {
+  router.push({name: 'Equipment', params: {equipmentId: equipment.equipmentId}})
+}
+const handleClubClick = club => {
+  router.push({name: 'AllClubs', params: {clubId: club.clubId}})
+}
 const navigateToVenue = venue => {
   const venueId = venue.courtId
   router.push({name: 'Fields', params: {courtId: venueId}})
@@ -204,15 +205,32 @@ const fetchAllClubs1 = async () => {
   let result = await fetchAllClubs()
   allClubs.value = result
 }
+const getStatusByDate = event => {
+  const now = moment()
+  const start = moment(event.startTime)
+  const end = moment(event.endTime)
+  const signUpDeadline = moment(event.signUpDeadline)
+
+  if (now.isBefore(signUpDeadline)) {
+    return '报名中'
+  } else if (now.isBetween(start, end)) {
+    return '进行中'
+  } else if (now.isAfter(end)) {
+    return '已结束'
+  } else {
+    return '未开始'
+  }
+}
+
 // 获取所有活动信息
 const fetchActivityList = async () => {
   try {
     const response = await getAllActivityApi()
     events.value = response.data.map(item => ({
       ...item,
-      startTime: formatTimestamp(item.startTime), // 使用 formatTimestamp 格式化开始时间
-      endTime: formatTimestamp(item.endTime), // 使用 formatTimestamp 格式化结束时间
-      signUpDeadline: formatTimestamp(item.signUpDeadline) // 使用 formatTimestamp 格式化报名截止时间
+      startTime: moment(item.startTime).format('YYYY-MM-DD HH:mm:ss'),
+      endTime: moment(item.endTime).format('YYYY-MM-DD HH:mm:ss'),
+      signUpDeadline: moment(item.signUpDeadline).format('YYYY-MM-DD HH:mm:ss')
     }))
   } catch (error) {
     console.error('获取活动列表失败:', error)
@@ -232,6 +250,11 @@ const fetchEquipmentsList = async () => {
     console.error('获取器材列表失败:', error)
   }
 }
+const randomSixEquipments = computed(() => {
+  // 打乱数组并获取前6个器材
+  const shuffled = equipmentList.value.sort(() => 0.5 - Math.random()).slice(0, 6)
+  return shuffled
+})
 const fetchAnnouncement = async () => {
   try {
     const response = await getAllAnnouncementApi()
@@ -264,8 +287,9 @@ const fetchAnnouncement = async () => {
     ]
   }
 }
-const showAnnouncementDialog = () => {
-  dialogVisible.value = true
+const showAnnouncementDialog = announcementItem => {
+  currentAnnouncement.value = announcementItem // 设置当前公告项
+  dialogVisible.value = true // 显示对话框
 }
 const getRandomVenues = count => {
   const shuffled = venues.value.sort(() => 0.5 - Math.random()) // 随机打乱数组
@@ -379,13 +403,14 @@ onMounted(() => {
   width: 100%; /* 表格宽度 */
   border-collapse: collapse; /* 合并边框 */
   margin-top: 20px; /* 表格与卡片头部的间距 */
+  text-align: center; /* 表格整体文本居中 */
 }
 
 .activity-table th,
 .activity-table td {
   border: 1px solid #dcdfe6; /* 单元格边框 */
-  text-align: left; /* 文本对齐 */
   padding: 12px; /* 单元格内边距 */
+  text-align: center; /* 文本居中 */
 }
 
 .activity-table th {

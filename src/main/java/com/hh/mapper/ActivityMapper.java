@@ -17,7 +17,7 @@ public interface ActivityMapper {
     @Update("UPDATE activities SET organizer_id = #{organizerId}, name = #{name}, location = #{location}, category_id = #{categoryId}, start_time = #{startTime}, end_time = #{endTime},description = #{description},sign_up_deadline = #{signUpDeadline},activity_pic = #{activityPic} WHERE activity_id = #{activityId}")
     int updateActivity(Activity activity);
 
-    @Select("SELECT * FROM activities")
+    @Select("SELECT * FROM activities ORDER BY end_time DESC")
     List<Activity> getAllActivities();
 
     @Select("SELECT * FROM registrations")

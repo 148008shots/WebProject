@@ -23,4 +23,6 @@ public interface BorrowingService {
     boolean decreaseEquipmentQuantity(Integer equipmentId, Integer borrowQuantity);
 
     List<EquipmentBorrowing> getAllEquipmentBorrowings();
+
+    List<EquipmentBorrowing> findBorrowingDetailsByUserId(Integer id);
 }

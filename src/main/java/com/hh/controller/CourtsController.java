@@ -64,12 +64,6 @@ public class CourtsController {
         return Result.success(times);
     }
 
-    @PostMapping("/createBooking")
-    public Result createBooking(@RequestBody Bookings booking) {
-        System.out.println(booking);
-        courtsService.createBooking(booking);
-        return Result.success();
-    }
 
     // 获取当天预约情况的API端点
     @GetMapping("/today-appointments")

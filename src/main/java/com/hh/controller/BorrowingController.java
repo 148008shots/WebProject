@@ -26,6 +26,13 @@ public class BorrowingController {
 
     }
 
+    @GetMapping("/getByUid/{id}")
+    public Result<List<EquipmentBorrowing>> getBorrowByUserId(@PathVariable Integer id) {
+        List<EquipmentBorrowing> equipmentBorrowingList = borrowingService.findBorrowingDetailsByUserId(id);
+        return Result.success(equipmentBorrowingList);
+
+    }
+
     @GetMapping("/getAllBorrowings")
     public Result getAllBorrowings() {
         List<EquipmentBorrowing> borrowings = borrowingService.getAllEquipmentBorrowings();
@@ -35,7 +42,7 @@ public class BorrowingController {
     @PostMapping("/addBorrowing")
     public Result addBorrowing(@RequestBody EquipmentBorrowing borrowing) {
         boolean result = borrowingService.addEquipmentBorrowing(borrowing);
-        return result ? Result.success("添加成功") : Result.error("添加失败");
+        return result ? Result.success("预约借用申请成功") : Result.error("预约借用申请失败");
     }
 
     @DeleteMapping("/deleteBorrowing/{borrowingId}")

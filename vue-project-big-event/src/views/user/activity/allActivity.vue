@@ -6,24 +6,24 @@
     <!-- 活动列表 -->
     <el-table :data="events" v-if="events.length" style="width: 100%; margin-top: 20px">
       <el-table-column prop="name" label="活动名称" width="180"></el-table-column>
-      <el-table-column prop="description" label="活动简述" width="300"></el-table-column>
-      <el-table-column prop="location" label="地点" width="180"></el-table-column>
-      <el-table-column label="活动图片" width="120">
+      <el-table-column prop="description" label="活动简述"></el-table-column>
+      <el-table-column prop="location" label="地点"></el-table-column>
+      <el-table-column label="活动图片" width="180">
         <template #default="scope">
           <img v-if="scope.row.activityPic" :src="scope.row.activityPic" alt="活动图片" style="width: 100px; height: auto"/>
         </template>
       </el-table-column>
-      <el-table-column prop="signUpDeadline" label="报名截至时间" width="180">
+      <el-table-column prop="signUpDeadline" label="报名截至时间">
         <template #default="scope">
           <span v-if="scope.row.signUpDeadline">{{ formatDate(scope.row.signUpDeadline) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="startTime" label="开始时间" width="180">
+      <el-table-column prop="startTime" label="开始时间">
         <template #default="scope">
           <span>{{ formatDateRange(scope.row.startTime, scope.row.startTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="endTime" label="结束时间" width="180">
+      <el-table-column prop="endTime" label="结束时间">
         <template #default="scope">
           <span>{{ formatDateRange(scope.row.endTime, scope.row.endTime) }}</span>
         </template>

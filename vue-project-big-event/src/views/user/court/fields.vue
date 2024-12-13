@@ -1,31 +1,37 @@
 <template>
   <div>
-    <!-- 搜索场地表单-->
-    <el-form inline>
-      <el-form-item label="场地分类">
-        <el-select placeholder="请选择" v-model="categoryId" style="width: 240px">
-          <el-option v-for="c in courtCategory" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="球场名称" style="width: 240px">
-        <el-input v-model="courtName" placeholder="请输入球场名称"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="fetchCourts">搜索</el-button>
-        <el-button @click=";(categoryId = ''), (courtName = '')">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <div class="search-container">
+      <!-- 搜索场地表单-->
+      <el-form inline>
+        <el-form-item label="场地分类">
+          <el-select placeholder="请选择" v-model="categoryId" style="width: 240px">
+            <el-option v-for="c in courtCategory" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="球场名称" style="width: 240px">
+          <el-input v-model="courtName" placeholder="请输入球场名称"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="fetchCourts">搜索</el-button>
+          <el-button @click=";(categoryId = ''), (courtName = '')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
     <!-- 场地列表 -->
-    <el-card v-for="venue in venues" :key="venue.courtId" class="card-item" shadow="hover">
-      <div class="card-content">
-        <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="cover-img"/>
-        <span v-else>无图片</span>
-        <div>场地编号: {{ venue.courtId }}</div>
-        <div>场地名称: {{ venue.courtNumber }}</div>
-        <div>位置: {{ venue.location }}</div>
-        <el-button type="primary" @click="showBookingDialog(venue)">预约</el-button>
-      </div>
-    </el-card>
+    <div class="card-container">
+      <el-card v-for="venue in venues" :key="venue.courtId" class="card-item" shadow="hover">
+        <div class="card-content">
+          <img v-if="venue.coverImg" :src="venue.coverImg" alt="封面图片" class="cover-img"/>
+          <span v-else>无图片</span>
+          <div class="info-container">
+            <div>场地编号: {{ venue.courtId }}</div>
+            <div>场地名称: {{ venue.courtNumber }}</div>
+            <div>位置: {{ venue.location }}</div>
+          </div>
+          <el-button type="primary" @click="showBookingDialog(venue)" class="reservation-button">预约</el-button>
+        </div>
+      </el-card>
+    </div>
 
     <!-- 预约对话框 -->
     <el-dialog v-model="bookingDialogVisible" title="预约场地" @close="closeBookingDialog">
@@ -79,16 +85,9 @@
     </el-dialog>
 
     <!-- 分页条 -->
-    <el-pagination
-        v-model:current-page="pageNum"
-        v-model:page-size="pageSize"
-        :page-sizes="[3, 5, 10, 15]"
-        layout="jumper, total, sizes, prev, pager, next"
-        background
-        :total="total"
-        @size-change="onSizeChange"
-        @current-change="onCurrentChange"
-        style="margin-top: 20px; justify-content: flex-end"/>
+    <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 15]"
+                   layout="jumper, prev, pager, next" background :total="total" @size-change="onSizeChange"
+                   @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end"/>
   </div>
 </template>
 
@@ -363,13 +362,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.search-container {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  margin-bottom: 20px; /* 与球场卡片保持一定距离 */
+}
+
 .card-item {
   width: 300px;
-  height: 250px; /* 固定高度 */
+  height: 300px; /* 固定高度 */
   margin: 10px;
   display: inline-block;
   vertical-align: top;
   overflow: hidden; /* 超出部分隐藏 */
+}
+
+.el-card {
+  flex: 1 1 300px; /* 每个卡片占据至少300px的宽度，并且可以伸缩 */
+  margin: 10px; /* 保持原有的外边距 */
 }
 
 .text-blue {
@@ -486,11 +496,36 @@ onMounted(() => {
   border-color: #2fd32f !important;
   color: #fff !important;
 }
+
 /* 预约对话框中的封面图片样式 */
 .dialog-cover-img {
   width: 600px; /* 固定宽度 */
   height: 300px; /* 固定高度 */
   object-fit: cover; /* 保持图片比例 */
   margin-bottom: 10px;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap; /* 允许卡片换行 */
+  justify-content: center; /* 卡片在容器中居中对齐 */
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column; /* 使内容垂直排列 */
+  align-items: center; /* 水平居中对齐所有子元素 */
+  justify-content: space-between; /* 子元素在垂直方向上分布，顶部对齐，底部留空 */
+  height: 100%; /* 使容器高度占满整个卡片 */
+  padding: 20px; /* 内边距 */
+}
+
+.info-container {
+  text-align: center; /* 文本居中 */
+  margin-bottom: 20px; /* 与预约按钮保持一定距离 */
+}
+
+.reservation-button {
+  align-self: stretch; /* 按钮宽度占满整个卡片宽度 */
 }
 </style>

@@ -12,6 +12,7 @@ public class EquipmentBorrowing {
         private String EquipmentName;
         private Integer userId;
         private String username;//用户名
+        private String location;
         private Integer borrowQuantity;
         private LocalDateTime borrowTime;
         private LocalDateTime returnTime;

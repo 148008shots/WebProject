@@ -19,7 +19,6 @@ public interface CourtsService {
     List<TimeSlots> getAllTimeSlot();
     List<TimeSlots> getAllTimeSlotByCourtId(Integer courtId,String date);
 
-    void createBooking(Bookings booking);
 
     List<Bookings> findAppointmentsByDate(String date);
 }

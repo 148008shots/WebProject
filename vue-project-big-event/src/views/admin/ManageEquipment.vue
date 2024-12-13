@@ -1,35 +1,42 @@
 <template>
-    <div>
-        <h2>器材管理</h2>
-        <!-- 添加器材按钮 -->
+    <div class="equipment-management">
+      <h2>器材管理</h2>
+      <!-- 添加器材按钮 -->
+      <div class="add-equipment-button">
         <el-button type="primary" @click="dialogVisible = true">添加器材</el-button>
-        <!-- 器材列表 -->
-        <el-table :data="equipments" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="name" label="器材名称" width="180"></el-table-column>
-            <el-table-column prop="equipmentCount" label="数量" width="100"></el-table-column>
-            <el-table-column label="coverImg" width="150">
-                <template #default="scope">
-                    <img :src="scope.row.coverImg" alt="头像" style="width: 50px; height: 50px; border-radius: 50%" />
-                </template>
-            </el-table-column>
-            <el-table-column prop="location" label="位置" width="180"></el-table-column>
-            <el-table-column label="操作" width="150">
-                <template #default="scope">
-                    <el-button @click="editEquipment(scope.row)">编辑</el-button>
-                    <el-button type="danger" @click="deleteEquipment(scope.row)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+      </div>
+      <!-- 器材列表 -->
+      <div class="equipment-table">
+        <div class="table-row header">
+          <div class="table-cell">器材名称</div>
+          <div class="table-cell">数量</div>
+          <div class="table-cell">器材图片</div>
+          <div class="table-cell">位置</div>
+          <div class="table-cell">操作</div>
+        </div>
+        <div v-for="equipment in equipments" :key="equipment.equipmentId" class="table-row">
+          <div class="table-cell">{{ equipment.name }}</div>
+          <div class="table-cell">{{ equipment.equipmentCount }}</div>
+          <div class="table-cell">
+            <img :src="equipment.coverImg" alt="器材图片" style="width: 50px; height: 50px; border-radius: 50%"/>
+          </div>
+          <div class="table-cell">{{ equipment.location }}</div>
+          <div class="table-cell">
+            <el-button @click="editEquipment(equipment)">编辑</el-button>
+            <el-button type="danger" @click="deleteEquipment(equipment)">删除</el-button>
+          </div>
+        </div>
+      </div>
 
-        <!-- 添加/编辑器材表单 -->
-        <el-dialog :title="isEditing ? '编辑器材' : '添加器材'" v-model="dialogVisible" width="30%">
-            <el-form :model="currentEquipment">
-                <el-form-item label="器材名称">
-                    <el-input v-model="currentEquipment.name" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="数量">
-                    <el-input-number v-model="currentEquipment.equipmentCount" :min="1"></el-input-number>
-                </el-form-item>
+      <!-- 添加/编辑器材表单 -->
+      <el-dialog :title="isEditing ? '编辑器材' : '添加器材'" v-model="dialogVisible" width="30%">
+        <el-form :model="currentEquipment">
+          <el-form-item label="器材名称">
+            <el-input v-model="currentEquipment.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="数量">
+            <el-input-number v-model="currentEquipment.equipmentCount" :min="1"></el-input-number>
+          </el-form-item>
                 <el-form-item label="位置">
                     <el-input v-model="currentEquipment.location" autocomplete="off"></el-input>
                 </el-form-item>
@@ -51,7 +58,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import {Plus} from '@element-plus/icons-vue'
 import {
   ElTable,
@@ -86,6 +93,13 @@ const pageNum = ref(1)
 const total = ref(20)
 const pageSize = ref(8)
 
+watch(dialogVisible, newValue => {
+  if (!newValue) {
+    currentEquipment.value = {}
+    isEditing.value = false
+  }
+})
+
 const editEquipment = equipment => {
   isEditing.value = true
   currentEquipment.value = {...equipment}
@@ -115,15 +129,15 @@ const deleteEquipment = async equipment => {
             type: 'error',
             message: '删除失败，请重试'
           })
-            }
+        }
+      })
+      .catch(() => {
+        // 用户点击了取消
+        ElMessage({
+          type: 'info',
+          message: '取消删除'
         })
-        .catch(() => {
-            // 用户点击了取消
-            ElMessage({
-                type: 'info',
-                message: '取消删除'
-            })
-        })
+      })
 }
 
 const saveEquipment = async () => {
@@ -162,7 +176,8 @@ const fetchEquipmentsList = async () => {
         coverImg: item.coverImg || '',
         name: item.name,
         equipmentCount: item.equipmentCount,
-        location: item.location
+        location: item.location,
+        equipmentId: item.equipmentId
       }))
       total.value = response.data.total
     } catch (error) {
@@ -187,34 +202,41 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dialog-footer {
-    text-align: right;
+.equipment-management {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.el-table {
-    border: 1px solid #ebeef5;
+.add-equipment-button {
+  align-self: flex-end;
+  margin-bottom: 20px;
 }
 
-.el-table th,
-.el-table td {
-    text-align: center;
-    vertical-align: middle;
+.equipment-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.table-row {
+  display: flex;
+  width: 100%;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ebeef5;
+  text-align: center;
+}
+
+.header {
+  font-weight: bold;
+  background-color: #f5f7fa;
 }
 
 .el-button {
-    margin: 0 5px;
-}
-.el-icon.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    text-align: center;
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    background-color: #fafafa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin: 0 5px;
 }
 </style>

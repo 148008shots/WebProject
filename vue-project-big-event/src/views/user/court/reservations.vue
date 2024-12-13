@@ -1,19 +1,23 @@
 <template>
-  <el-card class="borrowing-reservations-card">
     <div class="reservations-section">
-      <h3>预约信息</h3>
-      <div v-if="reservations.length > 0">
-        <div v-for="item in reservations" :key="item.bookingId" class="item">
-          <p><strong>预约日期:</strong> {{ item.reservationDate }}</p>
-          <p><strong>预约时间:</strong> {{ item.reservationTime }}</p>
-          <p><strong>场地/器材:</strong> {{ item.courtId }}</p>
-        </div>
-      </div>
+      <h3 class="title">我的预约记录</h3>
+      <el-table v-if="reservations.length > 0" :data="reservations">
+        <el-table-column type="index" label="序号"></el-table-column>
+        <el-table-column prop="reservationDate" label="预约日期"></el-table-column>
+        <el-table-column prop="reservationTime" label="预约时段"></el-table-column>
+        <el-table-column prop="courtNumber" label="预约的场地"></el-table-column>
+        <el-table-column prop="categoryName" label="场地类别"></el-table-column>
+        <el-table-column prop="location" label="场地位置"></el-table-column>
+        <el-table-column label="场地图片">
+          <template #default="scope">
+            <img v-if="scope.row.coverImg" :src="scope.row.coverImg" alt="场地图片"/>
+          </template>
+        </el-table-column>
+      </el-table>
       <div v-else>
         <p>暂无预约信息。</p>
       </div>
     </div>
-  </el-card>
 </template>
 
 <script setup>
@@ -44,17 +48,63 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.item {
-  margin-bottom: 20px;
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+.title {
+  text-align: center; /* 文本居中 */
+  color: #333; /* 字体颜色 */
+  font-size: 24px; /* 字体大小 */
+  margin: 20px 0; /* 上下边距 */
+  font-weight: bold; /* 字体加粗 */
+  border-bottom: 2px solid #f2f2f2; /* 下边框 */
+  padding-bottom: 10px; /* 下内边距 */
 }
 
-.item p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #666;
+/* 表格容器样式 */
+.reservations-section {
+  width: 100%; /* 确保容器宽度为100% */
+  overflow-x: auto; /* 如果内容超出屏幕宽度，允许横向滚动 */
+  display: flex; /* 使用flex布局 */
+  flex-direction: column; /* 子元素垂直排列 */
+}
+
+/* 表格样式 */
+.el-table {
+  width: 100%; /* 确保表格宽度为100% */
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+  margin: 0 auto; /* 居中显示表格 */
+}
+
+/* 表格头部样式 */
+.el-table th {
+  background-color: #f2f2f2;
+  color: #333;
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 表格内容样式 */
+.el-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 表格行样式 */
+.el-table tr {
+  transition: background-color 0.3s;
+}
+
+/* 表格行悬停样式 */
+.el-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* 图片样式 */
+.el-table .el-table__cell img {
+  width: 100%; /* 图片宽度适应单元格宽度 */
+  height: auto; /* 高度自动，以保持图片比例 */
+  object-fit: contain; /* 图片按比例缩放，不裁剪 */
+  border-radius: 4px; /* 可选：为图片添加圆角 */
 }
 </style>

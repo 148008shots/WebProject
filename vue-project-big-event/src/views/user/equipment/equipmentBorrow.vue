@@ -1,22 +1,29 @@
 <template>
-  <el-card class="borrowing-reservations-card">
-    <div slot="header" class="clearfix">
-      <span>借用信息</span>
+  <div class="borrowing-reservations-card">
+    <div class="header-center">
+      <h2>借用信息</h2>
     </div>
-    <div v-if="borrowings.length > 0" class="borrowings-section">
-      <div class="borrowing-container">
-        <div v-for="item in borrowings" :key="item.borrowingId" class="borrowing-item">
-          <p><strong>器材:</strong> {{ item.equipmentName || '未知' }}</p>
-          <p><strong>借用时间:</strong> {{ item.borrowTime }}</p>
-          <p><strong>归还时间:</strong> {{ item.returnTime }}</p>
-          <p><strong>状态:</strong> {{ item.borrowStatus === 2 ? '借用中' : '已归还' }}</p>
-        </div>
-      </div>
-    </div>
+    <el-table v-if="borrowings.length > 0" :data="borrowings" style="width: 100%">
+      <el-table-column prop="equipmentName" label="器材名称"></el-table-column>
+      <el-table-column prop="location" label="地点"></el-table-column>
+      <el-table-column prop="borrowQuantity" label="借用数量"></el-table-column>
+      <el-table-column prop="borrowTime" label="借用时间"></el-table-column>
+      <el-table-column prop="returnTime" label="归还时间"></el-table-column>
+      <el-table-column prop="borrowStatus" label="状态" width="100">
+        <template #default="{ row }">
+          {{ row.borrowStatus === 2 ? '借用中' : '已归还' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="coverImg" label="封面图片">
+        <template #default="{ row }">
+          <img v-if="row.coverImg" :src="row.coverImg" alt="器材图片" class="cover-img"/>
+        </template>
+      </el-table-column>
+    </el-table>
     <div v-else>
       <p>暂无借用信息。</p>
     </div>
-  </el-card>
+  </div>
 </template>
 
 <script setup>
@@ -48,43 +55,39 @@ onMounted(() => {
 
 <style scoped>
 .borrowing-reservations-card {
-  margin: 20px;
+  width: 100%; /* 确保容器宽度为100% */
+  overflow-x: auto; /* 如果内容超出屏幕宽度，允许横向滚动 */
 }
 
-.borrowings-section,
-.reservations-section {
-  margin-bottom: 20px;
+.header-center {
+  display: flex;
+  justify-content: center; /* 标题居中 */
+  align-items: center; /* 垂直居中 */
+  background-color: #f5f5f5; /* 标题背景颜色 */
+  padding: 10px; /* 标题内边距 */
+  border-bottom: 1px solid #e8e8e8; /* 标题与表格之间的边框 */
 }
 
-.borrowing-container {
-  background-color: #e8f4ff; /* 添加背景颜色 */
-  padding: 20px; /* 内边距 */
-  border-radius: 8px; /* 边框圆角 */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+.el-table {
+  width: 100%; /* 确保表格宽度为100% */
+  border-collapse: collapse;
+  border: 1px solid #ddd;
 }
 
-.borrowing-item {
-  display: flex; /* 设置flex布局 */
-  align-items: center; /* 垂直居中对齐 */
-  margin-bottom: 20px;
+.el-table th,
+.el-table td {
   padding: 10px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-.borrowing-item p {
-  margin: 0 10px; /* 设置左右外边距，而不是上下外边距 */
-  font-size: 14px;
-  color: #666;
+.el-table tr:hover {
+  background-color: #f5f5f5;
 }
 
-/* 为了确保第一个和最后一个<p>标签没有外边距，可以添加以下样式 */
-.borrowing-item p:first-child {
-  margin-left: 0;
-}
-
-.borrowing-item p:last-child {
-  margin-right: 0;
+.cover-img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
 }
 </style>

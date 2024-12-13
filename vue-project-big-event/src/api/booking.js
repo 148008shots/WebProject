@@ -5,5 +5,5 @@ export const fetchReservationsApi = async userId => {
 }
 // 创建场地预约
 export const creatBooking = bookingInfo => {
-    return request.post('/court/createBooking', bookingInfo)
+    return request.post('/Booking/createBooking', bookingInfo)
 }

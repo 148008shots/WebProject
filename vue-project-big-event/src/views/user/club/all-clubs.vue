@@ -3,16 +3,16 @@
         <h2>全部社团</h2>
         <!-- 全部俱乐部列表 -->
         <el-table :data="allClubs" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="name" label="社团名称" width="180"></el-table-column>
-            <el-table-column prop="category" label="社团类别" width="180"></el-table-column>
-            <el-table-column prop="description" label="社团简介" width="300"></el-table-column>
-            <el-table-column prop="address" label="社团地址" width="180"></el-table-column>
-            <el-table-column prop="members" label="社团人数" width="180"></el-table-column>
-            <el-table-column prop="clubsPic" label="社团图片" width="180">
-              <template #default="scope">
-                <img :src="scope.row.clubsPic" alt="社团图片" class="club-pic"/>
-              </template>
-            </el-table-column>
+          <el-table-column prop="name" label="社团名称" width="180"></el-table-column>
+          <el-table-column prop="category" label="社团类别" width="180"></el-table-column>
+          <el-table-column prop="description" label="社团简介"></el-table-column>
+          <el-table-column prop="address" label="社团地址"></el-table-column>
+          <el-table-column prop="members" label="社团人数"></el-table-column>
+          <el-table-column prop="clubsPic" label="社团图片" width="180">
+            <template #default="scope">
+              <img :src="scope.row.clubsPic" alt="社团图片" class="club-pic"/>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="150">
             <template #default="scope">
               <el-button type="primary" @click="showClubDetails(scope.row)">加入社团</el-button>
@@ -100,19 +100,19 @@ const joinClub = async () => {
       clubId: currentClub.value.clubId,
       operation: 0
     }
-        // 调用后端API，传入社团ID和用户ID
-        const response = await updateUserClub(params)
-        // 检查响应状态，如果成功，可以给用户反馈
-        if (response.code === 0) {
-          // 更新UI，例如显示一个提示消息
-          ElMessage.success('你已成功加入社团！')
-          // 可能还需要重新获取社团列表以更新社团人数等信息
-          await fetchAllClubs1()
-          // 关闭弹窗
-          dialogVisible.value = false
-        } else {
+    // 调用后端API，传入社团ID和用户ID
+    const response = await updateUserClub(params)
+    // 检查响应状态，如果成功，可以给用户反馈
+    if (response.code === 0) {
+      // 更新UI，例如显示一个提示消息
+      ElMessage.success('你已成功加入社团！')
+      // 可能还需要重新获取社团列表以更新社团人数等信息
+      await fetchAllClubs1()
+      // 关闭弹窗
+      dialogVisible.value = false
+    } else {
             // 处理错误情况
-          ElMessage.error('加入社团失败，请稍后再试。')
+      ElMessage.error('加入社团失败，请稍后再试。')
         }
     } catch (error) {
         // 捕获并处理错误

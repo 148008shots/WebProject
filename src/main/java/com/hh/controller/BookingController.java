@@ -4,10 +4,7 @@ import com.hh.pojo.Bookings;
 import com.hh.pojo.Result;
 import com.hh.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +20,14 @@ public class BookingController {
 
     @GetMapping("/getById/{id}")
     public Result<List<Bookings>> getBooksById(@PathVariable Integer id) {
-        List<Bookings> bookingsList = bookingService.getBooksById(id);
+        List<Bookings> bookingsList = bookingService.findBookingsByUserId(id);
         return Result.success(bookingsList);
+    }
+
+    @PostMapping("/createBooking")
+    public Result createBooking(@RequestBody Bookings booking) {
+        System.out.println(booking);
+        bookingService.createBooking(booking);
+        return Result.success();
     }
 }

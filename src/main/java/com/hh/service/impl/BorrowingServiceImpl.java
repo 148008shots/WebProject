@@ -28,8 +28,14 @@ public class BorrowingServiceImpl implements BorrowingService {
     }
 
     @Override
+    public List<EquipmentBorrowing> findBorrowingDetailsByUserId(Integer id) {
+        return borrowingMapper.findBorrowingDetailsByUserId(id);
+    }
+
+    @Override
     public boolean addEquipmentBorrowing(EquipmentBorrowing borrowing) {
         borrowing.setBorrowStatus(1);
+        borrowingMapper.updateEquipmentQuantity(borrowing.getEquipmentId(), -borrowing.getBorrowQuantity());
         return borrowingMapper.addBorrowing(borrowing) > 0;
     }
 

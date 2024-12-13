@@ -9,9 +9,9 @@
               {{ getCategoryName(scope.row.categoryId) }}
             </template>
           </el-table-column>
-          <el-table-column prop="description" label="社团简介" width="300"></el-table-column>
-          <el-table-column prop="address" label="社团地址" width="180"></el-table-column>
-          <el-table-column prop="members" label="社团人数" width="180"></el-table-column>
+          <el-table-column prop="description" label="社团简介"></el-table-column>
+          <el-table-column prop="address" label="社团地址"></el-table-column>
+          <el-table-column prop="members" label="社团人数"></el-table-column>
           <el-table-column prop="clubsPic" label="社团图片" width="180">
             <template #default="scope">
               <img :src="scope.row.clubsPic" alt="社团图片" class="club-pic"/>
@@ -19,16 +19,16 @@
           </el-table-column>
           <el-table-column label="操作" width="150">
             <template #default="scope">
-                    <el-button @click="leaveClub(scope.row)" type="danger">退出社团</el-button>
-                </template>
-            </el-table-column>
+              <el-button @click="leaveClub(scope.row)" type="danger">退出社团</el-button>
+            </template>
+          </el-table-column>
         </el-table>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus'
+import {ref, onMounted} from 'vue'
+import {ElTable, ElTableColumn, ElButton, ElMessage} from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
 import {fetchUserClubsApi1, updateUserClub} from '@/api/clubs'
 import {getAllCategories} from '@/api/court.js'

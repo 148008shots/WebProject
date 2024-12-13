@@ -41,6 +41,7 @@ public class EquipmentController {
     }
     @PutMapping("/updateEquipment")
     public Result updateEquipment(@RequestBody Equipment equipment) {
+        System.out.println(equipment);
         boolean result = equipmentService.updateEquipment(equipment);
         return result ? Result.success("更新成功") : Result.error("更新失败");
     }

@@ -28,6 +28,24 @@ public interface BorrowingMapper {
             "JOIN equipment e ON eb.equipment_id = e.equipment_id")
     List<EquipmentBorrowing> findAllWithUserInfoAndEquipmentInfo();
 
+    @Select({
+            "SELECT ",
+            "eb.borrowing_id,",
+            "eb.user_id,",
+            "eb.equipment_id,",
+            "eb.borrow_time,",
+            "eb.return_time,",
+            "eb.borrow_status,",
+            "eb.borrow_quantity,",
+            "e.name AS equipment_name,",
+            "e.location,",
+            "e.cover_img",
+            "FROM equipmentborrowings eb",
+            "JOIN equipment e ON eb.equipment_id = e.equipment_id",
+            "WHERE eb.user_id = #{userId}"
+    })
+    List<EquipmentBorrowing> findBorrowingDetailsByUserId(@Param("userId") int userId);
+
     @Insert("INSERT INTO `equipmentborrowings` (`equipment_id`, `user_id`, `borrow_time`, `return_time`, `borrow_quantity`) " +
             "VALUES (#{equipmentId}, #{userId}, #{borrowTime}, #{returnTime}, #{borrowQuantity})")
     int addBorrowing(EquipmentBorrowing borrowing);

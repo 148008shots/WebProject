@@ -90,17 +90,6 @@ public class CourtsServiceImpl implements CourtsService {
         return !timeSlotLocalTime.isBefore(startLocalTime) && !timeSlotLocalTime.isAfter(endLocalTime);
     }
 
-
-    public void createBooking(Bookings booking) {
-        int[] dateParts = TimeForUtil.parseDate1(booking.getDate());
-        booking.setDayOfYear(dateParts[0]);
-        booking.setDayOfMonth(dateParts[1]);
-        booking.setDay(dateParts[2]);
-        booking.setCreatedAt(LocalDateTime.now());
-        System.out.println(booking);
-        courtMapper.insertBooking(booking);
-    }
-
     @Override
     public List<Bookings> findAppointmentsByDate(String date) {
         int[] dateParts = TimeForUtil.parseDate1(date);

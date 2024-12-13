@@ -1,14 +1,16 @@
 <template>
   <!-- 搜索场地表单-->
-  <el-form inline>
-    <el-form-item label="器材名称" style="width: 240px">
-      <el-input v-model="searchEquipmentName" placeholder="请输入器材名称"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="fetchEquipmentsList">搜索</el-button>
-      <el-button @click="searchEquipmentName = ''">重置</el-button>
-    </el-form-item>
-  </el-form>
+  <div class="search-form">
+    <el-form inline>
+      <el-form-item label="器材名称" style="width: 240px">
+        <el-input v-model="searchEquipmentName" placeholder="请输入器材名称"></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="fetchEquipmentsList">搜索</el-button>
+        <el-button @click="searchEquipmentName = ''">重置</el-button>
+      </el-form-item>
+    </el-form>
+  </div>
 
   <div class="gym-equipment-list">
     <el-card v-for="equipment in equipmentList" :key="equipment.id" class="equipment-item" shadow="hover">
@@ -23,34 +25,30 @@
 
     <!-- 借用对话框 -->
     <el-dialog title="借用器材" v-model="borrowDialogVisible" width="30%">
-      <el-form :model="borrowForm">
-        <el-form-item label="借用器材名称">
+      <el-form :model="borrowForm" :rules="rules" ref="borrowFormRef">
+        <el-form-item label="借用器材名称" prop="equipmentName">
           <el-input v-model="borrowForm.equipmentName" disabled></el-input>
         </el-form-item>
-        <el-form-item label="借用时间">
+        <el-form-item label="借用时间" prop="borrowTime">
           <el-date-picker v-model="borrowForm.borrowTime" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
-        <el-form-item label="预计归还时间">
+        <el-form-item label="预计归还时间" prop="returnTime">
           <el-date-picker v-model="borrowForm.returnTime" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
-        <el-form-item label="借用数量">
+        <el-form-item label="借用数量" prop="borrowQuantity">
           <el-input-number v-model="borrowForm.borrowQuantity" :min="1"></el-input-number>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-                <el-button @click="borrowDialogVisible = false">取消</el-button>
+                <el-button @click="resetBorrowForm()">取消</el-button>
                 <el-button type="primary" @click="submitBorrow">申请借用</el-button>
             </span>
     </el-dialog>
   </div>
-  <!-- 分页条 -->
-  <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 15]"
-                 layout="jumper, total, sizes, prev, pager, next" background :total="total" @size-change="onSizeChange"
-                 @current-change="onCurrentChange" style="margin-top: 20px; justify-content: flex-end"/>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, reactive} from 'vue'
 import {
   ElCard,
   ElButton,
@@ -62,14 +60,10 @@ import {
   ElInputNumber,
   ElMessage
 } from 'element-plus'
-import {fetchAllEquipments} from '@/api/equipment.js'
+import {fetchAllEquipmentsApi} from '@/api/equipment.js'
 import {addBorrowing} from '@/api/Borrowings.js'
 import useUserInfoStore from '@/stores/userInfo'
 
-// 分页条数据模型
-const pageNum = ref(1)
-const total = ref(20)
-const pageSize = ref(8)
 // 器材列表数据模型
 const equipmentList = ref([])
 
@@ -93,13 +87,8 @@ const borrowForm = ref({
 // 获取全部器材列表
 const fetchEquipmentsList = async () => {
   try {
-    let params = {
-      pageNum: pageNum.value,
-      pageSize: pageSize.value,
-      searchEquipmentName: searchEquipmentName.value ? searchEquipmentName.value : null
-    }
-    const response = await fetchAllEquipments(params)
-    equipmentList.value = response.data.items.map(item => ({
+    const response = await fetchAllEquipmentsApi()
+    equipmentList.value = response.data.map(item => ({
       coverImg: item.coverImg || '',
       name: item.name,
       equipmentCount: item.equipmentCount,
@@ -111,36 +100,59 @@ const fetchEquipmentsList = async () => {
     console.error('获取器材列表失败:', error)
   }
 }
-//页码发生变化
-const onCurrentChange = num => {
-  pageNum.value = num
-  fetchEquipmentsList()
-}
-// 页码变化
-const onSizeChange = size => {
-  pageSize.value = size
-  fetchEquipmentsList()
-}
 // 打开借用对话框并设置当前器材信息
 const openBorrowDialog = equipment => {
-  console.log(equipment)
   borrowForm.value.equipmentName = equipment.name
   borrowForm.value.equipmentId = equipment.equipmentId // 设置equipmentId
   borrowDialogVisible.value = true
 }
+// 申请表单的时间校验
+const rules = reactive({
+  borrowTime: [{required: true, message: '请选择借用时间', trigger: 'change'}],
+  returnTime: [
+    {required: true, message: '请选择归还时间', trigger: 'change'},
+    {
+      type: 'date',
+      required: true,
+      message: '归还时间不能早于借用时间',
+      trigger: 'change',
+      validator: (rule, value, callback) => {
+        if (value && value < borrowForm.value.borrowTime) {
+          callback(new Error('预计归还时间不能早于申请借用时间'))
+        } else {
+          callback()
+        }
+      }
+    }
+  ]
+})
 
 // 提交借用信息
 const submitBorrow = async () => {
-  console.log('借用信息:', borrowForm.value)
   try {
+    // 首先进行表单验证
+    const valid = await borrowFormRef.value.validate()
+    if (!valid) {
+      ElMessage({
+        message: '表单验证失败',
+        type: 'error'
+      })
+      return // 表单验证失败，直接返回
+    }
+
+    // 表单验证通过后，提交借用信息
     const response = await addBorrowing(borrowForm.value)
-    // 检查后端返回的响应是否表示成功
     if (response && response.code === 0) {
       // 使用 ElMessage 显示成功消息
       ElMessage({
         message: response.data || '借用申请成功',
         type: 'success'
       })
+      ElMessage({
+        message: '请同学按时到器材室找管理员审核，核取器材',
+        type: 'success'
+      })
+      borrowDialogVisible.value = false // 关闭对话框
     } else {
       // 如果后端返回的 code 不为 0，显示错误消息
       ElMessage({
@@ -152,9 +164,23 @@ const submitBorrow = async () => {
     console.error('添加借用信息失败:', error)
     // 显示错误消息
     ElMessage({
-      message: error.data || '借用申请失败',
+      message: error.response?.data?.message || '借用申请失败' || error.message,
       type: 'error'
     })
+  }
+  resetBorrowForm()
+  fetchEquipmentsList()
+}
+
+//清楚申请表单信息
+const resetBorrowForm = () => {
+  borrowForm.value = {
+    equipmentName: '',
+    equipmentId: '',
+    userId: userInfoStore.info.id,
+    borrowTime: '',
+    returnTime: '',
+    borrowQuantity: 1
   }
   borrowDialogVisible.value = false // 关闭对话框
 }
@@ -191,5 +217,11 @@ onMounted(() => {
 
 .el-button {
   margin-top: 10px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center; /* 横向居中 */
+  margin-bottom: 20px; /* 与器材列表保持一定间距 */
 }
 </style>
