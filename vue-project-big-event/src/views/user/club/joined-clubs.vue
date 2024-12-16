@@ -28,7 +28,7 @@
 
 <script setup>
 import {ref, onMounted} from 'vue'
-import {ElTable, ElTableColumn, ElButton, ElMessage} from 'element-plus'
+import {ElTable, ElTableColumn, ElButton, ElMessage, ElMessageBox} from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
 import {fetchUserClubsApi1, updateUserClub} from '@/api/clubs'
 import {getAllCategories} from '@/api/court.js'
@@ -54,30 +54,28 @@ const initUserClubs = async () => {
 // 退出社团
 const leaveClub = async row => {
     try {
-        let params = {
-            userId: userInfoStore.info.id,
-            clubId: row.clubId,
-            operation: 1
-        }
-        // 调用后端API，传入社团ID和用户ID
-        const response = await updateUserClub(params)
-        // 检查响应状态，如果成功，可以给用户反馈
-        if (response.code === 0) {
-            // 更新UI，例如显示一个提示消息
-            ElMessage.success('你已成功退出社团！')
-            // 可能还需要重新获取社团列表以更新社团人数等信息
-            await initUserClubs()
-            // 更新用户已加入的社团列表
-            const index = userClubs.value.indexOf(row.id)
+      await ElMessageBox.confirm('你确定要退出这个社团吗？', '退出确认', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      let params = {
+        userId: userInfoStore.info.id,
+        clubId: row.clubId,
+        operation: 1
+      }
+      const response = await updateUserClub(params)
+      if (response.code === 0) {
+        ElMessage.success('你已成功退出社团！')
+        await initUserClubs()
+        const index = userClubs.value.indexOf(row)
             if (index > -1) {
                 userClubs.value.splice(index, 1)
             }
         } else {
-          // 处理错误情况
-          ElMessage.error('退出社团失败，请稍后再试。')
+        ElMessage.error('退出社团失败，请稍后再试。')
         }
     } catch (error) {
-      // 捕获并处理错误
       console.error('退出社团时发生错误：', error)
       ElMessage.error('退出社团时发生错误，请稍后再试。')
     }
@@ -99,14 +97,22 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
+}
+
 .el-table {
-    border: 1px solid #ebeef5;
+  border: 1px solid #ebeef5;
 }
 
 .el-table th,
 .el-table td {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .el-button {

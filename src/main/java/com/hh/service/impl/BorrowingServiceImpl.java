@@ -1,11 +1,6 @@
 package com.hh.service.impl;
-
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.hh.mapper.BorrowingMapper;
-import com.hh.pojo.Equipment;
 import com.hh.pojo.EquipmentBorrowing;
-import com.hh.pojo.PageBean;
 import com.hh.service.BorrowingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

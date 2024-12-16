@@ -47,7 +47,6 @@
         <p><strong>活动名称：</strong>{{ currentEvent.name }}</p>
         <p><strong>活动描述：</strong>{{ currentEvent.description }}</p>
         <p><strong>地点：</strong>{{ currentEvent.location }}</p>
-
         <p><strong>开始时间：</strong>{{ formatDate(currentEvent.startTime) }}</p>
         <p><strong>结束时间：</strong>{{ formatDate(currentEvent.endTime) }}</p>
         <p><strong>状态：</strong>{{
@@ -57,15 +56,17 @@
       </div>
       <span slot="footer" class="dialog-footer">
                 <el-button @click="detailsDialogVisible = false">关闭</el-button>
+        <!-- 添加退出活动按钮，并绑定 disabled 属性 -->
+                <el-button type="danger" :disabled="isExitButtonDisabled" @click="handleExitEvent">退出活动</el-button>
             </span>
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import {ElTable, ElTableColumn, ElButton, ElDialog, ElTag, ElMessage, ElMessageBox} from 'element-plus'
-import {getActivityListServiceByUser} from '@/api/activity.js'
+import {getActivityListServiceByUser, signUpActivityApi} from '@/api/activity.js'
 import useUserInfoStore from '@/stores/userInfo'
 
 const currentEvent = ref({})
@@ -80,7 +81,13 @@ const userInfoStore = useUserInfoStore()
 const pageNum = ref(1)
 const total = ref(20)
 const pageSize = ref(3)
-
+// 计算属性，判断退出活动按钮是否应该被禁用
+const isExitButtonDisabled = computed(() => {
+  if (!currentEvent.value) return true // 如果没有选择活动，禁用按钮
+  const now = new Date()
+  const signUpDeadline = new Date(currentEvent.value.signUpDeadline)
+  return now > signUpDeadline // 如果当前日期大于报名截至日期，禁用按钮
+})
 // 状态和颜色显示函数
 const statusTextAndColor = (signUpDeadline, startTime, endTime) => {
   const now = new Date() // 获取当前时间
@@ -108,17 +115,13 @@ const statusTextAndColor = (signUpDeadline, startTime, endTime) => {
   // 如果活动已经开始但尚未结束
   return {text: '进行中', color: '#E6A23C'} // 橙色
 }
-// 分页大小变化
-const onSizeChange = size => {
-  pageSize.value = size
-  fetchActivityList()
+
+// 展示详情函数
+const showEventDetails = event => {
+  currentEvent.value = event
+  detailsDialogVisible.value = true
 }
-// 页码分身变化处理函数
-const onCurrentChange = num => {
-  pageNum.value = num
-  fetchActivityList()
-}
-// 获取所有活动信息
+// 获取用户参加的活动活动信息
 const fetchActivityList = async () => {
   try {
     const params = {
@@ -137,6 +140,52 @@ const fetchActivityList = async () => {
   }
 }
 
+// 退出活动函数
+const handleExitEvent = async () => {
+  console.log(currentEvent)
+  // 使用 Pinia 的 useUserInfoStore 来获取用户信息
+  const userInfoStore = useUserInfoStore()
+  // 从用户信息中获取用户ID
+  const userId = userInfoStore.info.id // 这里应该是从用户会话或登录信息中获取的实际用户ID
+
+  try {
+    // 构建参数对象
+    const params = {
+      activityId: currentEvent.value.activityId, // 使用 selectedEvent 获取活动ID
+      userId: userId, // 用户ID
+      operation: 1
+    }
+
+    console.log(params)
+    await ElMessageBox.confirm('确定要退出活动吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const response = await signUpActivityApi(params) // 假设这是退出活动的API服务
+    if (response.code == 0) {
+      ElMessage.success('退出活动成功')
+      // 更新活动列表，移除当前活动或更新状态
+      detailsDialogVisible.value = false
+      fetchActivityList()
+    } else {
+      ElMessage.error('退出活动失败')
+    }
+  } catch (error) {
+    console.error('退出活动失败:', error)
+    ElMessage.error('操作失败')
+  }
+}
+// 分页大小变化
+const onSizeChange = size => {
+  pageSize.value = size
+  fetchActivityList()
+}
+// 页码分身变化处理函数
+const onCurrentChange = num => {
+  pageNum.value = num
+  fetchActivityList()
+}
 // 日期
 const formatDateRange = (startTime, endTime) => {
   const start = new Date(startTime)
@@ -152,12 +201,6 @@ const formatDateRange = (startTime, endTime) => {
       ? `${yearStart}-${monthStart.toString().padStart(2, '0')}-${dayStart.toString().padStart(2, '0')}`
       : `${yearStart}-${monthStart.toString().padStart(2, '0')}-${dayStart.toString().padStart(2, '0')} 至 ${yearEnd}-${monthEnd.toString().padStart(2, '0')}-${dayEnd.toString().padStart(2, '0')}`
 }
-// 展示详情函数
-const showEventDetails = event => {
-  currentEvent.value = event
-  detailsDialogVisible.value = true
-}
-
 // 详细时间
 const formatDate = dateStr => {
   const date = new Date(dateStr)
@@ -195,5 +238,13 @@ onMounted(() => {
 
 .el-button {
   margin: 0 5px;
+}
+
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
 }
 </style>

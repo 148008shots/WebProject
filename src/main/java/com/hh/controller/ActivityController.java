@@ -94,7 +94,7 @@ public class ActivityController {
                         } else {
                             // 如果未报名，则加入活动
                             activityService.joinActivity(userId, activityId);
-                            activityService.increaseClubMember(activityId);
+                            activityService.increaseActivityMember(activityId);
                             resultCode = 0; // 成功
                             resultMessage = "成功加入活动";
                         }
@@ -103,7 +103,7 @@ public class ActivityController {
                         if (isRegistered) {
                             // 如果已报名，则退出活动
                             activityService.leaveActivity(userId, activityId);
-                            activityService.decreaseClubMember(activityId);
+                            activityService.decreaseActivityMember(activityId);
                             resultCode = 0; // 成功
                             resultMessage = "成功退出活动";
                         } else {

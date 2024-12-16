@@ -203,7 +203,7 @@ const startLooping = () => {
 // 获取所有社团列表
 const fetchAllClubs1 = async () => {
   let result = await fetchAllClubs()
-  allClubs.value = result
+  allClubs.value = result.data
 }
 const getStatusByDate = event => {
   const now = moment()
@@ -225,15 +225,19 @@ const getStatusByDate = event => {
 // 获取所有活动信息
 const fetchActivityList = async () => {
   try {
-    const response = await getAllActivityApi()
-    events.value = response.data.map(item => ({
+    const response = await getAllActivityApi();
+    // 将活动按开始时间排序，最新的活动在前
+    const sortedEvents = response.data.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    // 只取最新的5个活动
+    const recentEvents = sortedEvents.slice(0, 5).map(item => ({
       ...item,
       startTime: moment(item.startTime).format('YYYY-MM-DD HH:mm:ss'),
       endTime: moment(item.endTime).format('YYYY-MM-DD HH:mm:ss'),
       signUpDeadline: moment(item.signUpDeadline).format('YYYY-MM-DD HH:mm:ss')
-    }))
+    }));
+    events.value = recentEvents;
   } catch (error) {
-    console.error('获取活动列表失败:', error)
+    console.error('获取活动列表失败:', error);
   }
 }
 // 获取全部器材列表

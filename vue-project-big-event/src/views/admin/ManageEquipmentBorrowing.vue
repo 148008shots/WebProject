@@ -21,7 +21,7 @@
             <el-button @click="openReviewDialog(scope.row)">审核</el-button>
           </template>
         </el-table-column>
-        </el-table>
+      </el-table>
         <!-- 审核对话框 -->
         <el-dialog title="审核借用信息" v-model="reviewDialogVisible" width="30%">
             <el-form :model="currentBorrowing">
@@ -55,7 +55,7 @@ import {
   ElMessageBox,
   ElMessage
 } from 'element-plus'
-import {fetchAllBorrowings, updateBorrowing, updateBorrowingStatus} from '@/api/Borrowings.js'
+import {fetchAllBorrowings, updateBorrowing, updateBorrowingStatus1} from '@/api/Borrowings.js'
 
 const borrowDialogVisible = ref(false)
 const reviewDialogVisible = ref(false)
@@ -66,10 +66,10 @@ const borrowings = ref([])
 const fetchBorrowingsList = async () => {
   try {
     const response = await fetchAllBorrowings()
-        borrowings.value = response.data
-    } catch (error) {
-        console.error('获取借用信息列表失败:', error)
-    }
+    borrowings.value = response.data
+  } catch (error) {
+    console.error('获取借用信息列表失败:', error)
+  }
 }
 
 // 计算属性用于格式化借用时间
@@ -82,8 +82,26 @@ const formattedBorrowTimes = computed(() => {
 })
 
 const openReviewDialog = borrowing => {
-    currentBorrowing.value = { ...borrowing }
-    reviewDialogVisible.value = true
+  // 根据数字码获取对应的文字描述
+  let statusText
+  switch (borrowing.borrowStatus) {
+    case 0:
+      statusText = '申请中'
+      break
+    case 1:
+      statusText = '已借出'
+      break
+    case 2:
+      statusText = '已归还'
+      break
+    default:
+      statusText = '未知状态'
+  }
+  currentBorrowing.value = {
+    ...borrowing,
+    borrowStatus: statusText // 使用文字描述而不是状态码
+  }
+  reviewDialogVisible.value = true
 }
 
 const updateBorrowStatus = async () => {
@@ -93,17 +111,15 @@ const updateBorrowStatus = async () => {
     }
     const params = {
         borrowingId: currentBorrowing.value.borrowingId,
-        equipmentId: currentBorrowing.value.equipmentId,
-        borrowQuantity: currentBorrowing.value.borrowQuantity,
         newStatus: currentBorrowing.value.borrowStatus
     }
     try {
-        // 直接传递borrowingId 和 newStatus 作为参数
-        await updateBorrowingStatus(params)
-        ElMessage({
-            type: 'success',
-            message: '审核成功'
-        })
+      // 直接传递borrowingId 和 newStatus 作为参数
+      await updateBorrowingStatus1(params)
+      ElMessage({
+        type: 'success',
+        message: '审核成功'
+      })
       reviewDialogVisible.value = false
       fetchBorrowingsList() // 重新加载列表以更新状态
     } catch (error) {

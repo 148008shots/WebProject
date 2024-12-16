@@ -67,7 +67,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public int increaseClubMember(Integer activityId) {
+    public int increaseActivityMember(Integer activityId) {
         Integer nweMember = 1;
         return activityMapper.updateActivityMember(nweMember, activityId);
     }
@@ -84,7 +84,7 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public int decreaseClubMember(Integer activityId) {
+    public int decreaseActivityMember(Integer activityId) {
         Integer nweMember = 1;
         return activityMapper.updateActivityMember(-nweMember, activityId);
     }

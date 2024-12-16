@@ -37,3 +37,21 @@ export const updateBorrowingStatus = params => {
     // 发送PUT请求
     return request.put('/Borrowing/updateBorrowing1', searchParams, config)
 }
+// 更新借用信息的状态
+export const updateBorrowingStatus1 = params => {
+    // 使用URLSearchParams来构建查询字符串
+    const searchParams = new URLSearchParams()
+    for (const key in params) {
+        searchParams.append(key, params[key])
+    }
+
+    // 设置Axios请求配置
+    const config = {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }
+
+    // 发送PUT请求
+    return request.put('/Borrowing/updateBorrowing2', searchParams, config)
+}

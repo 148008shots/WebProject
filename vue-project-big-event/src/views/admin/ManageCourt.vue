@@ -1,48 +1,54 @@
 <template>
     <div>
-        <h2>场地管理</h2>
-        <!-- 添加场地按钮 -->
+      <h2>场地管理</h2>
+      <!-- 添加场地按钮 -->
+      <div class="add-venue-button">
         <el-button type="primary" @click="dialogVisible = true">添加场地</el-button>
+      </div>
+      <!-- 场地列表 -->
+      <div class="venue-table">
+        <div class="table-row header">
+          <div class="table-cell">场地编号</div>
+          <div class="table-cell">场地名称</div>
+          <div class="table-cell">类别</div>
+          <div class="table-cell">位置</div>
+          <div class="table-cell">封面图片</div>
+          <div class="table-cell">操作</div>
+        </div>
+        <div v-for="venue in venues" :key="venue.courtId" class="table-row">
+          <div class="table-cell">{{ venue.courtId }}</div>
+          <div class="table-cell">{{ venue.courtNumber }}</div>
+          <div class="table-cell">{{ venue.category }}</div>
+          <div class="table-cell">{{ venue.location }}</div>
+          <div class="table-cell">
+            <img :src="venue.coverImg" alt="封面图片" style="width: 50px; height: 50px"/>
+          </div>
+          <div class="table-cell">
+            <el-button @click="editVenue(venue)">编辑</el-button>
+            <el-button type="danger" @click="deleteVenue(venue)">删除</el-button>
+          </div>
+        </div>
+      </div>
+      <!-- 分页条 -->
+      <el-pagination
+          v-model:current-page="pageNum"
+          v-model:page-size="pageSize"
+          :page-sizes="[3, 5, 10, 15]"
+          layout="jumper, total, sizes, prev, pager, next"
+          background
+          :total="total"
+          @size-change="onSizeChange"
+          @current-change="onCurrentChange"
+          style="margin-top: 20px; justify-content: flex-end"/>
 
-        <!-- 场地列表 -->
-        <el-table :data="venues" style="width: 100%; margin-top: 20px">
-            <el-table-column prop="courtId" label="场地编号" width="100"></el-table-column>
-            <el-table-column prop="courtNumber" label="场地名称" width="180"></el-table-column>
-            <el-table-column prop="category" label="类别" width="180"></el-table-column>
-            <el-table-column prop="location" label="位置" width="180"></el-table-column>
-            <el-table-column prop="coverImg" label="封面图片" width="180">
-                <template #default="scope">
-                    <img v-if="scope.row.coverImg" :src="scope.row.coverImg" alt="封面图片" style="width: 100px; height: auto" />
-                    <span v-else>无图片</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="150">
-                <template #default="{ row }">
-                    <el-button :icon="Edit" circle plain type="primary" @click="editVenue(row)"></el-button>
-                    <el-button :icon="Delete" circle plain type="danger" @click="deleteVenue(row)"></el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <!-- 分页条 -->
-        <el-pagination
-            v-model:current-page="pageNum"
-            v-model:page-size="pageSize"
-            :page-sizes="[3, 5, 10, 15]"
-            layout="jumper, total, sizes, prev, pager, next"
-            background
-            :total="total"
-            @size-change="onSizeChange"
-            @current-change="onCurrentChange"
-            style="margin-top: 20px; justify-content: flex-end" />
-
-        <!-- 添加/编辑场地表单 -->
-        <el-dialog :title="isEditing" v-model="dialogVisible" width="30%">
-            <el-form :model="currentVenue">
-                <el-form-item label="类别" required>
-                    <el-select v-model="currentVenue.categoryId" placeholder="请选择">
-                        <el-option v-for="c in categorys" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
-                    </el-select>
-                </el-form-item>
+      <!-- 添加/编辑场地表单 -->
+      <el-dialog :title="isEditing" v-model="dialogVisible" width="30%">
+        <el-form :model="currentVenue">
+          <el-form-item label="类别" required>
+            <el-select v-model="currentVenue.categoryId" placeholder="请选择">
+              <el-option v-for="c in categorys" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
+            </el-select>
+          </el-form-item>
                 <el-form-item label="位置" required>
                     <el-input v-model="currentVenue.location" autocomplete="off"></el-input>
                 </el-form-item>
@@ -87,9 +93,6 @@ const currentVenue = ref({
     coverImg: ''
 })
 
-//用户搜索时选中的分类id
-const categoryId = ref('')
-
 //分页条数据模型
 const pageNum = ref(1) //当前页
 const total = ref(20) //总条数
@@ -108,22 +111,26 @@ const onCurrentChange = num => {
     pageNum.value = num
     fetchCourts()
 }
+
 // 获取所有场地列表
 const fetchCourts = async () => {
     try {
-        let params = {
-            pageNum: pageNum.value, // 当前页码
-            pageSize: pageSize.value // 每页显示的条数
+      let params = {
+        pageNum: pageNum.value, // 当前页码
+        pageSize: pageSize.value // 每页显示的条数
+      }
+      const response = await getCourts(params)
+      venues.value = response.data.items.map(item => {
+        const category = categorys.value.find(c => c.categoryId === item.categoryId)
+        return {
+          courtId: item.courtId,
+          courtNumber: item.courtNumber,
+          category: category ? category.name : '未知类别', // 设置类别名称
+          location: item.location,
+          coverImg: item.coverImg || ''
         }
-        const response = await getCourts(params)
-        venues.value = response.data.items.map(item => ({
-            courtId: item.courtId,
-            courtNumber: item.courtNumber,
-            category: item.categoryName, // Ensure category is included
-            location: item.location,
-            coverImg: item.coverImg || ''
-        }))
-        total.value = response.data.total // 设置总条数
+      })
+      total.value = response.data.total // 设置总条数
     } catch (error) {
         console.error('Error fetching courts:', error)
     }
@@ -203,14 +210,14 @@ const saveVenue = async () => {
 }
 // 更新函数
 const updateCourt1 = async () => {
-    // 调用更新场地的服务
-    let result = await updateCourt(currentVenue.value)
-    // 根据结果展示消息
-    if (result.message) {
-      ElMessage.success(result.message)
-    } else {
-      ElMessage.error('更新失败')
-    }
+  // 调用更新场地的服务
+  let result = await updateCourt(currentVenue.value)
+  // 根据结果展示消息
+  if (result.message) {
+    ElMessage.success(result.message)
+  } else {
+    ElMessage.error('更新失败')
+  }
   // 关闭对话框
   dialogVisible.value = false
 
@@ -225,60 +232,55 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dialog-footer {
-    text-align: right;
-    padding-top: 20px;
+.venue-management {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.el-table {
-    border: 1px solid #ebeef5;
+.add-venue-button {
+  align-self: flex-end;
+  margin-bottom: 20px;
 }
 
-.el-table th,
-.el-table td {
-    text-align: center;
-    vertical-align: middle;
+.venue-table {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.table-row {
+  display: flex;
+  width: 100%;
+}
+
+.table-cell {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ebeef5;
+  text-align: center;
+}
+
+.header {
+  font-weight: bold;
+  background-color: #f5f7fa;
 }
 
 .el-button {
-    margin: 0 5px;
+  margin: 0 5px;
 }
 
-.el-icon.avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 178px;
-    height: 178px;
-    text-align: center;
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    background-color: #fafafa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.venue-table .table-cell img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 
-.el-upload {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 178px;
-    height: 178px;
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    background-color: #fafafa;
-}
-
-.el-form-item {
-    margin-bottom: 24px;
-}
-
-.el-form-item__label {
-    font-weight: bold;
-}
-
-.el-input,
-.el-select {
-    width: 100%;
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
 }
 </style>

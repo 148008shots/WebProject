@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h2>校园活动</h2>
-        <!-- 活动列表 -->
+      <h2>校园活动</h2>
+      <!-- 活动列表 -->
       <el-table :data="events" v-if="events.length" style="width: 100%; margin-top: 20px">
         <el-table-column prop="name" label="活动名称" width="180"></el-table-column>
         <el-table-column prop="description" label="活动简述" width="300"></el-table-column>
@@ -41,17 +41,17 @@
           </template>
         </el-table-column>
       </el-table>
-        <!-- 分页条 -->
-        <el-pagination
-            v-model:current-page="pageNum"
-            v-model:page-size="pageSize"
-            :page-sizes="[3, 5, 10, 15]"
-            layout="jumper, total, sizes, prev, pager, next"
-            background
-            :total="total"
-            @size-change="onSizeChange"
-            @current-change="onCurrentChange"
-            style="margin-top: 20px; justify-content: flex-end"/>
+      <!-- 分页条 -->
+      <el-pagination
+          v-model:current-page="pageNum"
+          v-model:page-size="pageSize"
+          :page-sizes="[3, 5, 10, 15]"
+          layout="jumper, total, sizes, prev, pager, next"
+          background
+          :total="total"
+          @size-change="onSizeChange"
+          @current-change="onCurrentChange"
+          style="margin-top: 20px; justify-content: flex-end"/>
 
       <!-- 编辑活动表单 -->
       <el-dialog title="编辑活动" v-model="editDialogVisible" width="30%">
@@ -373,11 +373,19 @@ onMounted(() => {
 
 .el-table th,
 .el-table td {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .el-button {
-    margin: 0 5px;
+  margin: 0 5px;
+}
+
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
 }
 </style>

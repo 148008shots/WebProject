@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface ActivityMapper {
-    @Insert("INSERT INTO activities (organizer_id, name, location, category_id, start_time, end_time,sign_up_deadline,description,activity_pic) VALUES (#{organizerId}, #{name}, #{location}, #{categoryId}, #{startTime}, #{endTime},#{signUpDeadline},#{description},#{activityPic})")
+    @Insert("INSERT INTO activities (organizer_id, name, location, category_id, start_time, end_time,sign_up_deadline,description,activity_pic,content) VALUES (#{organizerId}, #{name}, #{location}, #{categoryId}, #{startTime}, #{endTime},#{signUpDeadline},#{description},#{activityPic},#{Content})")
     int insertActivity(Activity activity);
 
     @Delete("DELETE FROM activities WHERE activity_id = #{activityId}")
@@ -40,7 +40,7 @@ public interface ActivityMapper {
             "a.description " +
             "FROM activities a " +
             "JOIN registrations r ON a.activity_id = r.activity_id " +
-            "WHERE r.user_id = #{userId}")
+            "WHERE r.user_id = #{userId} AND r.registrations_status = 0")
     List<Activity> selectActivityByUserId(Integer userId);
 
     @Select("SELECT * FROM registrations WHERE activity_id = #{activityId} AND user_id = #{userId}")

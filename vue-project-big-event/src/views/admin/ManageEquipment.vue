@@ -37,18 +37,21 @@
           <el-form-item label="数量">
             <el-input-number v-model="currentEquipment.equipmentCount" :min="1"></el-input-number>
           </el-form-item>
-                <el-form-item label="位置">
-                    <el-input v-model="currentEquipment.location" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="封面图片" required>
-                    <el-upload ref="uploadRef" :show-file-list="false" :auto-upload="true" action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }" :on-success="uploadSuccess1">
-                        <img v-if="currentEquipment.coverImg" :src="currentEquipment.coverImg" style="width: 100px; height: auto" />
-                        <el-icon v-else class="avatar-uploader-icon">
-                            <Plus />
-                        </el-icon>
-                    </el-upload>
-                </el-form-item>
-            </el-form>
+          <el-form-item label="位置">
+            <el-input v-model="currentEquipment.location" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="封面图片" required>
+            <el-upload ref="uploadRef" :show-file-list="false" :auto-upload="true"
+                       action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }"
+                       :on-success="uploadSuccess1">
+              <img v-if="currentEquipment.coverImg" :src="currentEquipment.coverImg"
+                   style="width: 100px; height: auto"/>
+              <el-icon v-else class="avatar-uploader-icon">
+                <Plus/>
+              </el-icon>
+            </el-upload>
+          </el-form-item>
+        </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveEquipment">确定</el-button>
@@ -202,6 +205,14 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
+}
+
 .equipment-management {
   display: flex;
   flex-direction: column;

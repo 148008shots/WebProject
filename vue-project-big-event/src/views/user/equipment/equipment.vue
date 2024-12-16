@@ -71,7 +71,7 @@ const equipmentList = ref([])
 const searchEquipmentName = ref([])
 //获取用户信息
 const userInfoStore = useUserInfoStore()
-
+const borrowFormRef = ref(null)
 // 借用对话框状态
 const borrowDialogVisible = ref(false)
 // 借用表单数据
@@ -95,7 +95,6 @@ const fetchEquipmentsList = async () => {
       location: item.location,
       equipmentId: item.equipmentId
     }))
-    total.value = response.data.total
   } catch (error) {
     console.error('获取器材列表失败:', error)
   }

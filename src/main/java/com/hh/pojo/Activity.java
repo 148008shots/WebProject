@@ -13,6 +13,7 @@ public class Activity {
     private String name;
     private String location;
     private String description;
+    private String Content;
     private String activityPic;
     private Integer CategoryId;
     private Date startTime;

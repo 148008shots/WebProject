@@ -22,13 +22,13 @@ public interface ActivityService {
 
     void joinActivity(Integer userId, Integer activityId);
 
-    int increaseClubMember(Integer activityId);
+    int increaseActivityMember(Integer activityId);
 
     void leaveActivity(Integer userId, Integer activityId);
 
     List<Registration> selectRegistrationsByUserIdAndActivityId(Integer userId, Integer activityId);
 
-    int decreaseClubMember(Integer activityId);
+    int decreaseActivityMember(Integer activityId);
 
     List<Activity> getActivityByUserCreateId(Integer id);
 }

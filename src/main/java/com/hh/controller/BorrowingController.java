@@ -80,4 +80,15 @@ public class BorrowingController {
         }
         return result ? Result.success("操作成功") : Result.error("操作失败");
     }
+
+    @PutMapping("/updateBorrowing2")
+    public Result updateBorrowingStatus1(
+            @RequestParam Integer borrowingId,
+            @RequestParam Integer newStatus
+    ) {
+//        预约更新预约表里面的状态
+        borrowingService.updateBorrowingStatus(borrowingId, newStatus);
+//        对器材表里面的器材数量进行修改
+        return Result.success();
+    }
 }

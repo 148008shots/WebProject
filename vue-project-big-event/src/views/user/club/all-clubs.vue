@@ -4,7 +4,11 @@
         <!-- 全部俱乐部列表 -->
         <el-table :data="allClubs" style="width: 100%; margin-top: 20px">
           <el-table-column prop="name" label="社团名称" width="180"></el-table-column>
-          <el-table-column prop="category" label="社团类别" width="180"></el-table-column>
+          <el-table-column label="俱乐部类别" width="180">
+            <template #default="scope">
+              {{ getCategoryName(scope.row.categoryId) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="description" label="社团简介"></el-table-column>
           <el-table-column prop="address" label="社团地址"></el-table-column>
           <el-table-column prop="members" label="社团人数"></el-table-column>
@@ -43,10 +47,11 @@
 </template>
 
 <script setup>
-import {ref} from 'vue'
+import {ref, onMounted} from 'vue'
 import {ElTable, ElTableColumn, ElButton, ElMessage, ElDialog} from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
 import {fetchAllClubs, fetchUserClubsApi, updateUserClub} from '@/api/clubs'
+import {getAllCategories} from '@/api/court.js'
 
 // 当前用户已加入的社团ID列表
 const userClubs = ref([])
@@ -59,13 +64,16 @@ const dialogVisible = ref(false)
 
 // 获取当前浏览器用户信息
 const userInfoStore = useUserInfoStore()
-
+const categorys = ref([])
 // 获取所有社团列表
 const fetchAllClubs1 = async () => {
   let result = await fetchAllClubs()
-  allClubs.value = result
+  allClubs.value = result.data
 }
-
+const getCategoryName = categoryId => {
+  const category = categorys.value.find(c => c.categoryId === categoryId)
+  return category ? category.name : '未知分类'
+}
 // 初始化已加入社团列表
 const initUserClubs = async () => {
   try {
@@ -76,7 +84,11 @@ const initUserClubs = async () => {
     ElMessage.error('获取社团列表失败，请稍后再试。')
   }
 }
-
+// 获取场地分类
+const fetchCategories = async () => {
+  let result = await getAllCategories()
+  categorys.value = result.data
+}
 // 显示社团详细信息
 const showClubDetails = row => {
   currentClub.value = row
@@ -111,29 +123,39 @@ const joinClub = async () => {
       // 关闭弹窗
       dialogVisible.value = false
     } else {
-            // 处理错误情况
+      // 处理错误情况
       ElMessage.error('加入社团失败，请稍后再试。')
-        }
-    } catch (error) {
-        // 捕获并处理错误
-        console.error('加入社团时发生错误：', error)
     }
+  } catch (error) {
+    // 捕获并处理错误
+    console.error('加入社团时发生错误：', error)
+  }
 }
-
-// 调用获取所有俱乐部的函数
-fetchAllClubs1()
-initUserClubs()
+onMounted(() => {
+  // 调用获取所有俱乐部的函数
+  initUserClubs()
+  fetchCategories()
+  fetchAllClubs1()
+})
 </script>
 
 <style scoped>
+/* 添加以下样式 */
+h2 {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px; /* 可以根据需要调整字体大小 */
+  color: #333; /* 可以根据需要调整字体颜色 */
+}
+
 .el-table {
-    border: 1px solid #ebeef5;
+  border: 1px solid #ebeef5;
 }
 
 .el-table th,
 .el-table td {
-    text-align: center;
-    vertical-align: middle;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .el-button {

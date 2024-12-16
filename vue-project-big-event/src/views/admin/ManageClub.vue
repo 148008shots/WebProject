@@ -1,26 +1,26 @@
 <template>
     <div>
-        <h2>学生社团管理</h2>
-        <!-- 添加俱乐部按钮 -->
-        <el-button type="primary" @click="dialogVisible = true">添加社团</el-button>
+      <h2>学生社团管理</h2>
+      <!-- 添加俱乐部按钮 -->
+      <el-button type="primary" @click="dialogVisible = true">添加社团</el-button>
 
-        <!-- 俱乐部列表 -->
+      <!-- 俱乐部列表 -->
       <el-table :data="clubs" style="width: 100%; margin-top: 20px">
         <el-table-column prop="clubId" label="ID" width="100"></el-table-column>
-        <el-table-column prop="name" label="俱乐部名称" width="180"></el-table-column>
+        <el-table-column prop="name" label="俱乐部名称" width="200"></el-table-column>
         <el-table-column label="俱乐部类别" width="180">
           <template #default="scope">
             {{ getCategoryName(scope.row.category) }}
           </template>
         </el-table-column>
-        <el-table-column prop="clubsPic" label="社团图片" width="180">
+        <el-table-column prop="clubsPic" label="社团图片" width="200">
           <template #default="scope">
             <img :src="scope.row.clubsPic" alt="社团图片" class="club-pic"/>
           </template>
         </el-table-column>
         <el-table-column prop="description" label="简介" width="300"></el-table-column>
-        <el-table-column prop="address" label="地址" width="200 "></el-table-column>
-        <el-table-column prop="contact" label="联系人" width="180"></el-table-column>
+        <el-table-column prop="address" label="地址"></el-table-column>
+        <el-table-column prop="contactUserId" label="联系人" width="180"></el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
             <el-button @click="editClub(scope.row)">编辑</el-button>
@@ -28,14 +28,15 @@
           </template>
         </el-table-column>
       </el-table>
-        <!-- 添加/编辑俱乐部表单 -->
+
+      <!-- 添加/编辑俱乐部表单 -->
       <el-dialog :title="isEditing ? '编辑社团信息' : '添加社团'" v-model="dialogVisible" width="30%">
         <el-form :model="currentClub">
           <el-form-item label="社团名称">
             <el-input v-model="currentClub.name" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="社团类别">
-            <el-select v-model="currentClub.categoryId" placeholder="请选择社团类别">
+          <el-form-item label="俱乐部类别">
+            <el-select v-model="currentClub.category" placeholder="请选择俱乐部类别">
               <el-option v-for="category in categorys" :key="category.categoryId" :label="category.name"
                          :value="category.categoryId"></el-option>
             </el-select>
@@ -51,7 +52,7 @@
           </el-form-item>
           <el-form-item label="封面图片" required>
             <el-upload ref="uploadRef" :show-file-list="false" :auto-upload="true"
-                       action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }"
+                       action="/api/common/imgUpload?module=coverImg" :headers="{ Authorization: tokenStore.token }"
                        :on-success="uploadSuccess1">
               <img v-if="currentClub.clubsPic" :src="currentClub.clubsPic" style="width: 100px; height: auto"/>
               <el-icon v-else class="avatar-uploader-icon">
@@ -60,16 +61,16 @@
             </el-upload>
           </el-form-item>
         </el-form>
-            <span slot="footer" class="dialog-footer">
+        <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveClub">确定</el-button>
             </span>
-        </el-dialog>
+      </el-dialog>
     </div>
 </template>
 
 <script setup>
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, watch} from 'vue'
 import {ElTable, ElTableColumn, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import {fetchAllClubs, addClub, deleteClub, updateClub} from '@/api/clubs'
@@ -92,8 +93,8 @@ const editClub = async club => {
 
 const deleteClub1 = async clubId => {
   await deleteClub(clubId)
-    clubs.value = clubs.value.filter(c => c.clubId !== clubId)
-    fetchAllClubs1()
+  clubs.value = clubs.value.filter(c => c.clubId !== clubId)
+  fetchAllClubs1()
 }
 
 const saveClub = async () => {
@@ -111,9 +112,24 @@ const saveClub = async () => {
   fetchAllClubs1()
 }
 
+// 获取所有社团信息并直接映射数据
 const fetchAllClubs1 = async () => {
-  let result = await fetchAllClubs()
-  clubs.value = result
+  const clubsResult = await fetchAllClubs()
+  if (clubsResult.code === 0) {
+    clubs.value = clubsResult.data.map(item => ({
+      clubId: item.clubId,
+      name: item.name,
+      category: item.categoryId, // 保持后端返回的字段名
+      description: item.description,
+      address: item.address,
+      contactUserId: item.contactUserId, // 保持后端返回的字段名
+      clubsPic: item.clubsPic,
+      members: item.members
+    }))
+  } else {
+    // 处理错误
+    console.error(clubsResult.message)
+  }
 }
 
 // 获取场地分类
@@ -122,6 +138,7 @@ const fetchCategories = async () => {
   categorys.value = result.data
 }
 
+// 获取分类名称
 const getCategoryName = categoryId => {
   const category = categorys.value.find(c => c.categoryId === categoryId)
   return category ? category.name : '未知分类'
@@ -132,7 +149,20 @@ const uploadSuccess1 = async img => {
   currentClub.value.clubsPic = img.data
   console.log(img.data)
 }
-
+// 监听对话框的可见性，关闭时清空表单
+watch(dialogVisible, newVal => {
+  if (!newVal) {
+    currentClub.value = {
+      name: '',
+      category: null,
+      description: '',
+      address: '',
+      contact: '',
+      clubsPic: '',
+      members: 0
+    }
+  }
+})
 // 在组件挂载入时获取器材列表
 onMounted(() => {
   fetchCategories()
