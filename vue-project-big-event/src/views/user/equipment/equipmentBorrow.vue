@@ -9,9 +9,9 @@
       <el-table-column prop="borrowQuantity" label="借用数量"></el-table-column>
       <el-table-column prop="borrowTime" label="借用时间"></el-table-column>
       <el-table-column prop="returnTime" label="归还时间"></el-table-column>
-      <el-table-column prop="borrowStatus" label="状态" width="100">
+      <el-table-column prop="borrowStatus" label="状态" width="150">
         <template #default="{ row }">
-          {{ row.borrowStatus === 2 ? '借用中' : '已归还' }}
+          <el-tag :type="getStatus(row.borrowStatus).type" effect="dark">{{ getStatus(row.borrowStatus).text }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="coverImg" label="封面图片">
@@ -35,6 +35,16 @@ import formatTimestamp from '@/utils/dateUtils.js'
 const borrowings = ref([])
 const userInfoStore = useUserInfoStore()
 
+const getStatus = status => {
+  const statusConfig = {
+    0: {text: '申请中', type: 'info'},
+    1: {text: '申请通过，借用中', type: 'success'},
+    2: {text: '借用已归还', type: 'success'},
+    3: {text: '逾期未归还', type: 'danger'},
+    default: {text: '未知状态', type: 'warning'}
+  }
+  return statusConfig[status] || statusConfig.default
+}
 const fetchBorrowings = async () => {
   try {
     const response = await fetchBorrowingsApi(userInfoStore.info.id)

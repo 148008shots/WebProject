@@ -4,8 +4,6 @@ import { useTokenStore } from '@/stores/token.js'
 
 // 导入组件
 import LoginVue from '@/views/Login.vue'
-import ArticleCategoryVue from '@/views/user/article/ArticleCategory.vue'
-import ArticleManageVue from '@/views/user/article/ArticleManage.vue'
 import UserAvatarVue from '@/views/user/UserAvatar.vue'
 import UserInfoVue from '@/views/user/UserInfo.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
@@ -125,16 +123,6 @@ const routes = [
         // 默认跳转重定向配置
         redirect: '/index',
         children: [
-            {
-                path: '/article/category',
-                component: ArticleCategoryVue,
-                name: 'ArticleCategory' // 添加路由名称
-            },
-            {
-                path: '/article/manage',
-                component: ArticleManageVue,
-                name: 'ArticleManage' // 添加路由名称
-            },
             {
                 path: '/user/avatar',
                 component: UserAvatarVue,

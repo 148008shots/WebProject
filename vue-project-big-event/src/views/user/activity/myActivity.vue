@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, reactive, watch} from 'vue'
+import {ref, onMounted, reactive} from 'vue'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
 import {getAllCategories} from '@/api/court.js'
@@ -139,13 +139,13 @@ const saveEvent = async () => {
 
       if (isCustomValid) {
         // 自定义校验也通过，执行活动的添加或更新操作
+        // 自定义校验也通过，执行活动的添加或更新操作
+        const formattedEvent = formatEventDates(currentEvent)
         if (isEditing.value) {
           // 更新活动
-          await updateActivityService(currentEvent.value)
-          const index = activities.value.findIndex(e => e.id === currentEvent.value.id)
-          if (index !== -1) {
-            activities.value.splice(index, 1, currentEvent.value)
-          }
+          await updateActivityService(formattedEvent)
+          dialogVisible.value = false
+          ElMessage.success('更新成功')
         } else {
           // 添加活动
           await addActivityService(currentEvent)
@@ -204,12 +204,10 @@ const validateTimes = () => {
   }
 }
 const editActivity = activity => {
-  // 设置当前活动为编辑状态，并显示对话框
   isEditing.value = true
-  currentEvent.value = {...activity}
+  Object.assign(currentEvent, activity)
   dialogVisible.value = true
 }
-
 const deleteActivity = activityId => {
   // 确认删除操作
   ElMessageBox.confirm('此操作将永久删除该活动, 是否继续?', '提示', {
@@ -259,6 +257,15 @@ const fetchActivities = async () => {
 const uploadSuccess = async img => {
   //img就是后台响应的数据，格式为：{code:状态码，message：提示信息，data: 图片的存储地址}
   currentEvent.activityPic = img.data
+}
+// 格式化日期的函数
+const formatEventDates = event => {
+  return {
+    ...event,
+    signUpDeadline: event.signUpDeadline ? new Date(event.signUpDeadline).toISOString() : event.signUpDeadline,
+    startTime: event.startTime ? new Date(event.startTime).toISOString() : event.startTime,
+    endTime: event.endTime ? new Date(event.endTime).toISOString() : event.endTime
+  }
 }
 onMounted(() => {
   fetchActivities()

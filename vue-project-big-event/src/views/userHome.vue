@@ -52,14 +52,15 @@ const handelCommand = command => {
             <div class="logo-container">
                 <div class="el-aside__logo">运动场信息管理系统</div>
             </div>
-            <el-menu class="menu-container" active-text-color="#ffd04b" background-color="#232323" text-color="#fff" mode="horizontal" router>
-                <!-- 首页 -->
-                <el-menu-item index="/index">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>首页</span>
-                </el-menu-item>
+            <el-menu class="menu-container" active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
+                     mode="horizontal" router>
+              <!-- 首页 -->
+              <el-menu-item index="/index">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>首页</span>
+              </el-menu-item>
               <!-- 球馆 -->
               <el-sub-menu index="courts">
                 <template #title>
@@ -131,20 +132,6 @@ const handelCommand = command => {
                   <span>重置密码</span>
                 </el-menu-item>
               </el-sub-menu>
-              <!-- 文章分类 -->
-              <el-menu-item index="/article/category">
-                <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>文章分类</span>
-                </el-menu-item>
-                <!-- 文章管理 -->
-                <el-menu-item index="/article/manage">
-                    <el-icon>
-                        <Promotion />
-                    </el-icon>
-                    <span>文章管理</span>
-                </el-menu-item>
             </el-menu>
             <!-- 个人信息区域 -->
             <div class="user-info-container">

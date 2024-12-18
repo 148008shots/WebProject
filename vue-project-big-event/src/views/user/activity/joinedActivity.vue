@@ -142,30 +142,37 @@ const fetchActivityList = async () => {
 
 // 退出活动函数
 const handleExitEvent = async () => {
-  console.log(currentEvent)
-  // 使用 Pinia 的 useUserInfoStore 来获取用户信息
   const userInfoStore = useUserInfoStore()
-  // 从用户信息中获取用户ID
-  const userId = userInfoStore.info.id // 这里应该是从用户会话或登录信息中获取的实际用户ID
+  const userId = userInfoStore.info.id
 
   try {
-    // 构建参数对象
-    const params = {
-      activityId: currentEvent.value.activityId, // 使用 selectedEvent 获取活动ID
-      userId: userId, // 用户ID
-      operation: 1
-    }
-
-    console.log(params)
-    await ElMessageBox.confirm('确定要退出活动吗？', '提示', {
+    // 弹出确认框，如果用户取消，则不继续执行后面的代码
+    const confirmResult = await ElMessageBox.confirm('此退出活动操作后不可以再次参加此活动！！！！！！！确定要退出活动吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
-    const response = await signUpActivityApi(params) // 假设这是退出活动的API服务
-    if (response.code == 0) {
-      ElMessage.success('退出活动成功')
-      // 更新活动列表，移除当前活动或更新状态
+
+    if (!confirmResult) {
+      // 用户点击了取消按钮
+      ElMessage.info('已取消退出活动')
+      detailsDialogVisible.value = false
+      return
+    }
+
+    // 构建参数对象
+    const params = {
+      activityId: currentEvent.value.activityId,
+      userId: userId,
+      operation: 1 // 假设1代表退出活动
+    }
+
+    // 调用 API 退出活动
+    const response = await signUpActivityApi(params)
+
+    // 检查响应状态
+    if (response && response.code === 0) {
+      ElMessage.success(response.message || '退出活动成功')
       detailsDialogVisible.value = false
       fetchActivityList()
     } else {
