@@ -89,4 +89,9 @@ public class UserServiceImpl implements UserService {
         User u = userMapper.findByUserPhone(phone);
         return u;
     }
+
+    @Override
+    public void updateUserPoint(Integer userId, Integer points) {
+        userMapper.updateUserPoint(userId, points);
+    }
 }

@@ -157,5 +157,14 @@ public class UserController {
         userService.resetUpdatePassword(username, newPassword);
         return Result.success("密码重置成功");
     }
+
+    @PatchMapping("/updateUserPoints")
+    public Result updateUserPoints(@RequestParam("userId") Integer userId,
+                                   @RequestParam("points") Integer points) {
+        System.out.println(userId);
+        System.out.println(points);
+        userService.updateUserPoint(userId, points);
+        return Result.success("积分充值成功！");
+    }
 }
 

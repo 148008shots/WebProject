@@ -49,99 +49,105 @@ const handelCommand = command => {
     <el-container class="layout-container">
         <!-- 顶部导航区域 -->
         <el-header class="header-container">
-            <div class="logo-container">
-                <div class="el-aside__logo">运动场信息管理系统</div>
-            </div>
-            <el-menu class="menu-container" active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
-                     mode="horizontal" router>
-              <!-- 首页 -->
-              <el-menu-item index="/index">
+          <div class="logo-container">
+            <div class="el-aside__logo">运动场信息管理系统</div>
+          </div>
+          <el-menu class="menu-container" active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
+                   mode="horizontal" router>
+            <!-- 首页 -->
+            <el-menu-item index="/index">
+              <el-icon>
+                <Management/>
+              </el-icon>
+              <span>首页</span>
+            </el-menu-item>
+            <!-- 球馆 -->
+            <el-sub-menu index="courts">
+              <template #title>
                 <el-icon>
-                  <Management/>
+                  <Promotion/>
                 </el-icon>
-                <span>首页</span>
+                <span>球场</span>
+              </template>
+              <el-menu-item index="/court/fields">校园场地</el-menu-item>
+              <el-menu-item index="/court/reservations">我的预约</el-menu-item>
+            </el-sub-menu>
+            <el-sub-menu index="equipment">
+              <template #title>
+                <el-icon>
+                  <Promotion/>
+                </el-icon>
+                <span>器材</span>
+              </template>
+              <el-menu-item index="/Equipment">器材借用申请</el-menu-item>
+              <el-menu-item index="/equipment/equipmentBorrow">我的借用</el-menu-item>
+            </el-sub-menu>
+            <!-- 俱乐部 -->
+            <el-sub-menu index="2">
+              <template #title>
+                <el-icon>
+                  <UserFilled/>
+                </el-icon>
+                <span>体育社团</span>
+              </template>
+              <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
+              <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
+            </el-sub-menu>
+            <!-- 活动 -->
+            <el-sub-menu index="activity">
+              <template #title>
+                <el-icon>
+                  <Promotion/>
+                </el-icon>
+                <span>校园活动</span>
+              </template>
+              <el-menu-item index="/activity/allActivity">全部活动</el-menu-item>
+              <el-menu-item index="/activity/joinedActivity">我参加的活动</el-menu-item>
+              <el-menu-item index="/activity/myActivity">我发起的活动</el-menu-item>
+            </el-sub-menu>
+            <!-- 个人中心 -->
+            <el-sub-menu index="user">
+              <template #title>
+                <el-icon>
+                  <UserFilled/>
+                </el-icon>
+                <span>个人中心</span>
+              </template>
+              <el-menu-item index="/user/info">
+                <el-icon>
+                  <User/>
+                </el-icon>
+                <span>基本资料</span>
               </el-menu-item>
-              <!-- 球馆 -->
-              <el-sub-menu index="courts">
-                <template #title>
-                  <el-icon>
-                    <Promotion/>
-                  </el-icon>
-                  <span>球场</span>
-                </template>
-                <el-menu-item index="/court/fields">校园场地</el-menu-item>
-                <el-menu-item index="/court/reservations">我的预约</el-menu-item>
-              </el-sub-menu>
-              <el-sub-menu index="equipment">
-                <template #title>
-                  <el-icon>
-                    <Promotion/>
-                  </el-icon>
-                  <span>器材</span>
-                </template>
-                <el-menu-item index="/Equipment">器材借用申请</el-menu-item>
-                <el-menu-item index="/equipment/equipmentBorrow">我的借用</el-menu-item>
-              </el-sub-menu>
-              <!-- 俱乐部 -->
-              <el-sub-menu index="2">
-                <template #title>
-                  <el-icon>
-                    <UserFilled/>
-                  </el-icon>
-                  <span>体育社团</span>
-                </template>
-                <el-menu-item index="/club/joinedClubs">我加入的社团</el-menu-item>
-                <el-menu-item index="/club/allClubs">全部社团</el-menu-item>
-              </el-sub-menu>
-              <!-- 活动 -->
-              <el-sub-menu index="activity">
-                <template #title>
-                  <el-icon>
-                    <Promotion/>
-                  </el-icon>
-                  <span>校园活动</span>
-                </template>
-                <el-menu-item index="/activity/allActivity">全部活动</el-menu-item>
-                <el-menu-item index="/activity/joinedActivity">我参加的活动</el-menu-item>
-                <el-menu-item index="/activity/myActivity">我发起的活动</el-menu-item>
-              </el-sub-menu>
-              <!-- 个人中心 -->
-              <el-sub-menu index="user">
-                <template #title>
-                  <el-icon>
-                    <UserFilled/>
-                  </el-icon>
-                  <span>个人中心</span>
-                </template>
-                <el-menu-item index="/user/info">
-                  <el-icon>
-                    <User/>
-                  </el-icon>
-                  <span>基本资料</span>
-                </el-menu-item>
-                <el-menu-item index="/user/avatar">
-                  <el-icon>
-                    <Crop/>
-                  </el-icon>
-                  <span>更换头像</span>
-                </el-menu-item>
-                <el-menu-item index="/user/repassword">
-                  <el-icon>
-                    <EditPen/>
-                  </el-icon>
-                  <span>重置密码</span>
-                </el-menu-item>
-              </el-sub-menu>
-            </el-menu>
-            <!-- 个人信息区域 -->
-            <div class="user-info-container">
-                <div v-if="userInfoStore.info.role === 1">
-                    <strong>欢迎管理员: {{ userInfoStore.info.nickname }}</strong>
-                </div>
-                <div v-else>
-                    <strong>欢迎用户: {{ userInfoStore.info.nickname }}</strong>
-                </div>
-                <el-dropdown placement="bottom-end" @command="handelCommand">
+              <el-menu-item index="/user/avatar">
+                <el-icon>
+                  <Crop/>
+                </el-icon>
+                <span>更换头像</span>
+              </el-menu-item>
+              <el-menu-item index="/user/repassword">
+                <el-icon>
+                  <EditPen/>
+                </el-icon>
+                <span>重置密码</span>
+              </el-menu-item>
+              <el-menu-item index="/user/Point">
+                <el-icon>
+                  <EditPen/>
+                </el-icon>
+                <span>积分账户</span>
+              </el-menu-item>
+            </el-sub-menu>
+          </el-menu>
+          <!-- 个人信息区域 -->
+          <div class="user-info-container">
+            <div v-if="userInfoStore.info.role === 1">
+              <strong>欢迎管理员: {{ userInfoStore.info.nickname }}</strong>
+            </div>
+            <div v-else>
+              <strong>欢迎用户: {{ userInfoStore.info.nickname }}</strong>
+            </div>
+            <el-dropdown placement="bottom-end" @command="handelCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="imgUrl" />
                         <el-icon>

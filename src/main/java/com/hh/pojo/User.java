@@ -33,4 +33,5 @@ public class User {
     private LocalDateTime createTime;//创建时间
     private LocalDateTime updateTime;//更新时间
     private Integer role;//角色
+    private Integer points;//积分
 }

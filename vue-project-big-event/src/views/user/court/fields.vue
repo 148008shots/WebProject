@@ -32,12 +32,14 @@
         </div>
       </el-card>
     </div>
-
     <!-- 预约对话框 -->
     <el-dialog v-model="bookingDialogVisible" title="预约场地" @close="closeBookingDialog">
       <div>
         <img v-if="selectedVenue.coverImg" :src="selectedVenue.coverImg" alt="封面图片" class="dialog-cover-img"/>
-        <div>场地名称: {{ selectedVenue.courtNumber }}</div>
+        <div class="venue-info">
+          <div class="venue-name">场地名称: {{ selectedVenue.courtNumber }}</div>
+          <div class="venue-score">场地积分: {{ selectedVenue.score }}</div>
+        </div>
         <!-- 显示当前日期和往后两天的日期按钮 -->
         <div class="date-container">
           <div v-for="dateObj in visibleDates" :key="dateObj.date" class="date-button"
@@ -83,7 +85,18 @@
                 <el-button type="primary" @click="confirmBooking">确认预约</el-button>
             </span>
     </el-dialog>
-
+    <!-- 积分支付提示框 -->
+    <el-dialog v-model="paymentDialogVisible" title="积分支付" @close="closePaymentDialog">
+      <div class="payment-dialog">
+        <div>预约开始时间: {{ selectedStartTime }}</div>
+        <div>预约结束时间: {{ selectedEndTime }}</div>
+        <div>所需积分: {{ requiredScore }}</div>
+      </div>
+      <span slot="footer" class="dialog-footer payment-dialog-footer">
+                <el-button @click="closePaymentDialog">取消</el-button>
+                <el-button type="primary" @click="confirmPayment">确认支付</el-button>
+            </span>
+    </el-dialog>
     <!-- 分页条 -->
     <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[3, 5, 10, 15]"
                    layout="jumper, prev, pager, next" background :total="total" @size-change="onSizeChange"
@@ -96,6 +109,7 @@ import {ref, onMounted, watch} from 'vue'
 import {ElCard, ElPagination, ElDialog, ElButton, ElDatePicker, ElMessage} from 'element-plus'
 import {getCourts, getTimeSlots, getTimeSlotsForVenue, getAllCategories} from '@/api/court.js'
 import {creatBooking} from '@/api/booking.js'
+import {updateUserPoints} from '@/api/user.js'
 import {addDays, format} from 'date-fns'
 import {zhCN} from 'date-fns/locale' // 导入中文语言包
 import useUserInfoStore from '@/stores/userInfo'
@@ -124,6 +138,12 @@ const appointTimeArr = ref([])
 
 const times = ref([])
 const router = useRouter() // 使用 useRouter
+const userInfoStore = useUserInfoStore()
+// 新增的响应式数据
+const paymentDialogVisible = ref(false)
+const selectedStartTime = ref('')
+const selectedEndTime = ref('')
+const requiredScore = ref(0)
 //格式化时间显示函数
 const formatTime = time => {
   const [hours, minutes] = time.split(':').slice(0, 2)
@@ -161,11 +181,11 @@ const selectDate = dateObj => {
   fetchTimeSlotsForVenue(selectedVenue.value, selectedDate.value) // 查询对应日期的预约情况
 }
 //展示预约时间框
-// 修改 showBookingDialog 方法以包含路由跳转
+// 修改 showBookingDialog 方法以包含路由跳转和积分信息
 const showBookingDialog = async venue => {
   const venueId = venue.courtId // 获取场地 ID
   router.push({name: 'Fields', params: {courtId: venueId}}) // 路由跳转
-  selectedVenue.value = venue
+  selectedVenue.value = {...venue} // 深拷贝 venue 对象，确保响应式更新
   selectedDate.value = format(new Date(), 'yyyy-MM-dd') // 默认选择当天日期
   await fetchTimeSlotsForVenue(venue, selectedDate.value) // 获取当天的预约时间段情况
   bookingDialogVisible.value = true // 显示预约对话框
@@ -225,45 +245,73 @@ const confirmBooking = () => {
   // 获取开始和结束时间段
   const startIndex = sortedIndices[0]
   const endIndex = sortedIndices[sortedIndices.length - 1]
-  const startTime = times.value[startIndex].time
-  const endTime = times.value[endIndex].time
+  selectedStartTime.value = times.value[startIndex].time
+  selectedEndTime.value = times.value[endIndex].time
 
-  const userInfoStore = useUserInfoStore()
+  // 计算所需积分
+  requiredScore.value = (selectedCount - 1) * selectedVenue.value.score
 
+  // 显示积分支付提示框
+  paymentDialogVisible.value = true
+}
+
+// 新增的 confirmPayment 方法
+const confirmPayment = () => {
+  const userScore = userInfoStore.info.points
+
+  // 检查用户积分是否足够
+  if (userScore < requiredScore.value) {
+    ElMessage.error('积分余额不足')
+    return
+  }
   // 在这里处理预约逻辑
   const bookingInfo = {
     courtId: selectedVenue.value.courtId, // 场地ID
     userId: userInfoStore.info.id,
     courtName: selectedVenue.value.courtNumber, // 场地名称
     date: selectedDate.value, // 选择的日期
-    startTime: startTime, // 开始时间段
-    endTime: endTime // 结束时间段
+    startTime: selectedStartTime.value, // 开始时间段
+    endTime: selectedEndTime.value // 结束时间段
   }
-  console.log('预约信息:', bookingInfo)
-
   creatBooking(bookingInfo)
       .then(response => {
-        // 检查后端返回的code值来判断操作是否成功
         if (response.code === 0) {
           ElMessage.success('预约成功')
-          // 清空已选时间段
-          appointTimeArr.value = []
-          times.value.forEach(item => {
-            item.status = item.isBooked ? 1 : 2 // 重置为可预约或已有预约状态
-          })
+          deductScore(requiredScore.value)
+              .then(() => {
+                ElMessage.success('积分扣除成功')
+                appointTimeArr.value = []
+                times.value.forEach(item => (item.status = item.isBooked ? 1 : 2))
+                closePaymentDialog()
+              })
+              .catch(error => {
+                console.error('扣除积分失败:', error)
+                ElMessage.error('积分扣除失败，请重试')
+              })
         } else {
-          // 如果后端返回的code值不为0，提示预约失败
           ElMessage.error('预约失败: ' + response.message)
         }
       })
       .catch(error => {
-        // 网络请求失败或其他错误，提示预约失败
         console.error('预约请求失败:', error)
         ElMessage.error('预约失败')
       })
 
   // 关闭对话框
   bookingDialogVisible.value = false
+}
+// 新增的 closePaymentDialog 方法
+const closePaymentDialog = () => {
+  paymentDialogVisible.value = false
+}
+// 扣除积分的函数
+const deductScore = scoreAmount => {
+  const params = {
+    userId: userInfoStore.info.id,
+    points: userInfoStore.info.points - scoreAmount // 更新积分
+  }
+  // 假设有一个名为 deductScoreApi 的函数来处理积分扣除的API调用
+  return updateUserPoints(params)
 }
 // 获取场地列表
 const fetchCourts = async () => {
@@ -281,7 +329,8 @@ const fetchCourts = async () => {
       courtNumber: item.courtNumber,
       category: item.categoryName,
       location: item.location,
-      coverImg: item.coverImg || ''
+      coverImg: item.coverImg || '',
+      score: item.price
     }))
     total.value = response.data.total
   } catch (error) {
@@ -490,6 +539,7 @@ onMounted(() => {
 .date-button:hover {
   background-color: #b0e5e7;
 }
+
 /* 被选中的日期按钮样式 */
 .selected {
   background-color: #2fd32f !important; /* 当前预约 */
@@ -502,7 +552,27 @@ onMounted(() => {
   width: 600px; /* 固定宽度 */
   height: 300px; /* 固定高度 */
   object-fit: cover; /* 保持图片比例 */
-  margin-bottom: 10px;
+  margin: 0 auto 10px; /* 横向居中，上下间距 */
+}
+
+/* 场地信息样式 */
+.venue-info {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+/* 场地名称样式 */
+.venue-name {
+  font-size: 20px;
+  font-weight: bold;
+  margin-right: 20px;
+}
+
+/* 场地积分样式 */
+.venue-score {
+  font-size: 20px;
+  color: #3ea7f1;
 }
 
 .card-container {

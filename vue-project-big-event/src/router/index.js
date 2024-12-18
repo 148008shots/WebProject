@@ -28,6 +28,7 @@ import Auth from '@/views/Auth.vue'
 import adminindex from '@/views/admin.vue'
 import userHome from '@/views/userHome.vue'
 import Annoucementvue from '@/views/admin/Announcement.vue'
+import UserPoint from '@/views/user/UserPoint.vue'
 // 定义路由关系
 const routes = [
     // path: 访问的路径 component: 访问路径展示的组件
@@ -143,6 +144,11 @@ const routes = [
                 path: '/user/repassword',
                 component: UserResetPasswordVue,
                 name: 'UserResetPassword' // 添加路由名称
+            },
+            {
+                path: '/user/Point',
+                component: UserPoint,
+                name: 'Point' // 添加路由名称
             },
             {
                 path: '/club/allClubs',

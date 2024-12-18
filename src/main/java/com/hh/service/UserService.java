@@ -28,6 +28,8 @@ public interface UserService {
     void resetUpdatePassword(String username, String newPassword);
 
     User findByUserPhone(String phone);
+
+    void updateUserPoint(Integer userId, Integer points);
 }
 
 

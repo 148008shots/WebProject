@@ -39,4 +39,7 @@ public interface UserMapper {
 
     @Select("select * from user where phone = #{phone}")
     User findByUserPhone(String phone);
+
+    @Update("UPDATE user SET points = #{points}, update_time = NOW() WHERE id = #{userId}")
+    void updateUserPoint(Integer userId, Integer points);
 }

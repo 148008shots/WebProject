@@ -33,11 +33,6 @@ export const updateUserInfoService1 = userInfoDate => {
     return request.put('/user/update', userInfoDate)
 }
 export const updatePwd = data => {
-    /*     return request({
-            url: '/user/updatePwd', // 确保URL与后端接口一致
-            method: 'patch',
-            data: data // 直接传递对象，axios会自动将其转换为JSON字符串
-        }); */
     return request.patch('/user/updatePwd', data)
 }
 
@@ -65,4 +60,22 @@ export const userResetPasswordApi = data => {
             'Content-Type': 'application/json'
         }
     })
+}
+// 更新借用信息的状态
+export const updateUserPoints = params => {
+    // 使用URLSearchParams来构建查询字符串
+    const searchParams = new URLSearchParams()
+    for (const key in params) {
+        searchParams.append(key, params[key])
+    }
+
+    // 设置Axios请求配置
+    const config = {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    }
+
+    // 发送PUT请求
+    return request.patch('/user/updateUserPoints', searchParams, config)
 }

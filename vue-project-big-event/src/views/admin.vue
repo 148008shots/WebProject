@@ -53,16 +53,16 @@ const handelCommand = command => {
             <el-menu default-active="1" class="el-menu-demo vertical-menu" mode="vertical" router>
                 <el-menu-item index="/ManageUser">
                     <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>用户管理</span>
-                </el-menu-item>
-                <el-menu-item index="/ManageClub">
-                    <el-icon>
                       <Management/>
                     </el-icon>
-                  <span>俱乐部管理</span>
+                  <span>用户管理</span>
                 </el-menu-item>
+              <el-menu-item index="/ManageClub">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>社团管理</span>
+              </el-menu-item>
               <el-menu-item index="/ManageCourt">
                 <el-icon>
                   <Management/>
@@ -119,13 +119,13 @@ const handelCommand = command => {
                   </el-icon>
                   <span>更换头像</span>
                 </el-menu-item>
-                    <el-menu-item index="/admins/repassword">
-                        <el-icon>
-                            <EditPen />
-                        </el-icon>
-                        <span>重置密码</span>
-                    </el-menu-item>
-                </el-sub-menu>
+                <el-menu-item index="/admins/repassword">
+                  <el-icon>
+                    <EditPen/>
+                  </el-icon>
+                  <span>重置密码</span>
+                </el-menu-item>
+              </el-sub-menu>
             </el-menu>
         </el-aside>
         <!-- 右侧主区域 -->
