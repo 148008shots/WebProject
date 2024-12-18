@@ -25,7 +25,8 @@ public interface BorrowingMapper {
             "eb.borrow_status AS borrowStatus " +
             "FROM equipmentborrowings eb " +
             "JOIN user u ON eb.user_id = u.id " +
-            "JOIN equipment e ON eb.equipment_id = e.equipment_id")
+            "JOIN equipment e ON eb.equipment_id = e.equipment_id " +
+            "ORDER BY eb.borrowing_id DESC")
     List<EquipmentBorrowing> findAllWithUserInfoAndEquipmentInfo();
 
     @Select({

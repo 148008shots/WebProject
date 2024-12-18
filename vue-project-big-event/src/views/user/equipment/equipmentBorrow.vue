@@ -38,8 +38,8 @@ const userInfoStore = useUserInfoStore()
 const getStatus = status => {
   const statusConfig = {
     0: {text: '申请中', type: 'info'},
-    1: {text: '申请通过，借用中', type: 'success'},
-    2: {text: '借用已归还', type: 'success'},
+    1: {text: '借用中', type: 'success'},
+    2: {text: '已归还', type: 'success'},
     3: {text: '逾期未归还', type: 'danger'},
     default: {text: '未知状态', type: 'warning'}
   }

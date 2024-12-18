@@ -30,4 +30,10 @@ public class BookingController {
         bookingService.createBooking(booking);
         return Result.success();
     }
+
+    @GetMapping()
+    public Result<List<Bookings>> getAllBooking() {
+        List<Bookings> bookingsList = bookingService.findAllBookings();
+        return Result.success(bookingsList);
+    }
 }

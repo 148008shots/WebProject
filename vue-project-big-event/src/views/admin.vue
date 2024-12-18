@@ -59,28 +59,34 @@ const handelCommand = command => {
                 </el-menu-item>
                 <el-menu-item index="/ManageClub">
                     <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>俱乐部管理</span>
-                </el-menu-item>
-                <el-menu-item index="/ManageCourt">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>场地管理</span>
-                </el-menu-item>
-                <el-menu-item index="/ManageActivity">
-                    <el-icon>
-                        <Management />
-                    </el-icon>
-                    <span>活动管理</span>
-                </el-menu-item>
-                <el-menu-item index="/ManageEquipment">
-                    <el-icon>
                       <Management/>
                     </el-icon>
-                  <span>体育器材管理</span>
+                  <span>俱乐部管理</span>
                 </el-menu-item>
+              <el-menu-item index="/ManageCourt">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>场地管理</span>
+              </el-menu-item>
+              <el-menu-item index="/ManageBooking">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>场地预约管理</span>
+              </el-menu-item>
+              <el-menu-item index="/ManageActivity">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>活动管理</span>
+              </el-menu-item>
+              <el-menu-item index="/ManageEquipment">
+                <el-icon>
+                  <Management/>
+                </el-icon>
+                <span>体育器材管理</span>
+              </el-menu-item>
               <el-menu-item index="/ManageEquipmentBorrowing">
                 <el-icon>
                   <Management/>
@@ -103,16 +109,16 @@ const handelCommand = command => {
                 </template>
                 <el-menu-item index="/admins/info">
                   <el-icon>
-                            <User />
-                        </el-icon>
-                        <span>基本资料</span>
-                    </el-menu-item>
-                    <el-menu-item index="/admins/avatar">
-                        <el-icon>
-                            <Crop />
-                        </el-icon>
-                        <span>更换头像</span>
-                    </el-menu-item>
+                    <User/>
+                  </el-icon>
+                  <span>基本资料</span>
+                </el-menu-item>
+                <el-menu-item index="/admins/avatar">
+                  <el-icon>
+                    <Crop/>
+                  </el-icon>
+                  <span>更换头像</span>
+                </el-menu-item>
                     <el-menu-item index="/admins/repassword">
                         <el-icon>
                             <EditPen />

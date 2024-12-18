@@ -9,6 +9,7 @@ public class Bookings {
     private Integer bookingId;
     private Integer userId;
     private Integer courtId;
+    private String username;
     private String startTime;
     private String endTime;
     private LocalDateTime createdAt;

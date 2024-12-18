@@ -34,4 +34,9 @@ public class BookingServiceImpl implements BookingService {
         System.out.println(booking);
         bookingMapper.insertBooking(booking);
     }
+
+    @Override
+    public List<Bookings> findAllBookings() {
+        return bookingMapper.findAllBookings();
+    }
 }

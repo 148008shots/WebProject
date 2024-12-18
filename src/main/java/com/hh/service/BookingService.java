@@ -10,4 +10,6 @@ public interface BookingService {
     List<Bookings> findBookingsByUserId(Integer id);
 
     void createBooking(Bookings booking);
+
+    List<Bookings> findAllBookings();
 }
