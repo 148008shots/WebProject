@@ -13,6 +13,19 @@
             <img v-if="scope.row.coverImg" :src="scope.row.coverImg" alt="场地图片"/>
           </template>
         </el-table-column>
+        <el-table-column label="预约状态">
+          <template #default="scope">
+            <el-tag :type="getStatusType(scope.row.status)">
+              {{ getStatusText(scope.row.status) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <!-- 根据状态控制取消按钮的显示 -->
+            <el-button v-if="scope.row.status === 0" type="danger" @click="showCancelDialog(scope.row)">取消预约</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div v-else>
         <p>暂无预约信息。</p>
@@ -22,8 +35,9 @@
 
 <script setup>
 import {ref, onMounted} from 'vue'
+import {ElCard, ElPagination, ElDialog, ElButton, ElMessageBox, ElMessage} from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo'
-import {fetchReservationsApi} from '@/api/booking.js'
+import {fetchReservationsApi, cancelReservationApi} from '@/api/booking.js'
 import formatDate from '@/utils/formatDate.js'
 
 const reservations = ref([])
@@ -37,11 +51,72 @@ const fetchReservations = async () => {
       reservationDate: formatDate(item.dayOfYear, item.dayOfMonth, item.day), // 使用格式化工具拼接日期
       reservationTime: `${item.startTime} - ${item.endTime}` // 格式化预约时间
     }))
+    updateReservationStatus() // 更新预约状态
   } catch (error) {
     console.error('获取预约信息失败:', error)
   }
 }
+const handleCancelReservation = async reservationId => {
+  try {
+    await cancelReservationApi(reservationId)
+    fetchReservations() // 取消预约后重新获取预约信息
+    ElMessage.success('取消预约成功')
+  } catch (error) {
+    console.error('取消预约失败:', error)
+    ElMessage.error('取消预约失败')
+  }
+}
+const showCancelDialog = reservation => {
+  ElMessageBox.confirm(`您确定要取消在${reservation.courtNumber}的预约吗? 预约时间：${reservation.reservationDate} ${reservation.reservationTime}。取消后不可再次预约当日场次。`, '取消预约确认', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+      .then(async () => {
+        await handleCancelReservation(reservation.bookingId)
+      })
+      .catch(() => {
+        // 用户点击取消按钮
+      })
+}
+const getStatusType = status => {
+  switch (status) {
+    case 0:
+      return 'info' // 预约未使用
+    case 1:
+      return 'danger' // 预约已使用
+    case 2:
+      return 'success' // 预约已取消
+    default:
+      return 'default'
+  }
+}
 
+const getStatusText = status => {
+  switch (status) {
+    case 0:
+      return '预约未使用'
+    case 1:
+      return '预约已取消'
+    case 2:
+      return '预约已使用'
+    default:
+      return '状态未知'
+  }
+}
+const updateReservationStatus = () => {
+  const now = new Date()
+  reservations.value.forEach(reservation => {
+    // 只检查状态为0的预约记录
+    if (reservation.status === 0) {
+      const endTime = new Date(reservation.reservationDate + ' ' + reservation.endTime)
+      // 如果结束时间已经过去，则更新状态为2
+      if (endTime.getTime() < now.getTime()) {
+        reservation.status = 2 // 假设状态2表示预约已结束
+      }
+    }
+  })
+}
 onMounted(() => {
   fetchReservations()
 })

@@ -24,8 +24,16 @@
             <img :src="venue.coverImg" alt="封面图片" style="width: 50px; height: 50px"/>
           </div>
           <div class="table-cell">
-            <el-button @click="editVenue(venue)">编辑</el-button>
-            <el-button type="danger" @click="deleteVenue(venue)">删除</el-button>
+            <el-button type="primary" @click="editVenue(venue)">
+              <el-icon>
+                <Edit/>
+              </el-icon>
+            </el-button>
+            <el-button type="danger" @click="deleteVenue(venue)">
+              <el-icon>
+                <Delete/>
+              </el-icon>
+            </el-button>
           </div>
         </div>
       </div>
@@ -49,16 +57,18 @@
               <el-option v-for="c in categorys" :key="c.categoryId" :label="c.name" :value="c.categoryId"></el-option>
             </el-select>
           </el-form-item>
-                <el-form-item label="位置" required>
-                    <el-input v-model="currentVenue.location" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="场地名称" required>
-                    <el-input v-model="currentVenue.courtNumber" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="封面图片" required>
-                    <el-upload ref="uploadRef" :show-file-list="false" :auto-upload="true" action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }" :on-success="uploadSuccess1">
-                        <img v-if="currentVenue.coverImg" :src="currentVenue.coverImg" style="width: 100px; height: auto" />
-                        <el-icon v-else class="avatar-uploader-icon">
+          <el-form-item label="位置" required>
+            <el-input v-model="currentVenue.location" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="场地名称" required>
+            <el-input v-model="currentVenue.courtNumber" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="封面图片" required>
+            <el-upload ref="uploadRef" :show-file-list="false" :auto-upload="true"
+                       action="/api/common/imgUpload?moduel=coverImg" :headers="{ Authorization: tokenStore.token }"
+                       :on-success="uploadSuccess1">
+              <img v-if="currentVenue.coverImg" :src="currentVenue.coverImg" style="width: 100px; height: auto"/>
+              <el-icon v-else class="avatar-uploader-icon">
                             <Plus />
                         </el-icon>
                     </el-upload>

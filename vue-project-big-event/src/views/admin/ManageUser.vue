@@ -31,8 +31,16 @@
         </el-table-column>
         <el-table-column label="操作" width="180" align="center">
           <template #default="scope">
-            <el-button @click="editUser(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="deleteUser1(scope.row)">删除</el-button>
+            <el-button type="primary" @click="editUser(scope.row)">
+              <el-icon>
+                <Edit/>
+              </el-icon>
+            </el-button>
+            <el-button type="danger" @click="deleteUser1(scope.row)">
+              <el-icon>
+                <Delete/>
+              </el-icon>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -46,16 +54,16 @@
             <el-input v-model="editForm.nickname" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" :label-width="formLabelWidth">
-                    <el-input v-model="editForm.email" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="电话" :label-width="formLabelWidth">
-                    <el-input v-model="editForm.phone" autocomplete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="角色" :label-width="formLabelWidth">
-                    <el-select v-model="editForm.role" placeholder="请选择">
-                        <el-option label="管理员" value="1"></el-option>
-                        <el-option label="用户" value="0"></el-option>
-                    </el-select>
+            <el-input v-model="editForm.email" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="电话" :label-width="formLabelWidth">
+            <el-input v-model="editForm.phone" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="角色" :label-width="formLabelWidth">
+            <el-select v-model="editForm.role" placeholder="请选择">
+              <el-option label="管理员" value="1"></el-option>
+              <el-option label="用户" value="0"></el-option>
+            </el-select>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -67,9 +75,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { ElTable, ElTableColumn, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElMessage, ElMessageBox } from 'element-plus'
-import { fetchAllUsers, updateUserInfo, deleteUser } from '@/api/user.js'
+import {ref, onMounted} from 'vue'
+import {View, Edit, Delete} from '@element-plus/icons-vue'
+import {
+  ElTable,
+  ElTableColumn,
+  ElButton,
+  ElDialog,
+  ElForm,
+  ElFormItem,
+  ElInput,
+  ElSelect,
+  ElOption,
+  ElMessage,
+  ElMessageBox,
+  ElIcon
+} from 'element-plus'
+import {fetchAllUsers, updateUserInfo, deleteUser} from '@/api/user.js'
 
 const users = ref([])
 const dialogVisible = ref(false)
@@ -77,8 +99,8 @@ const editForm = ref({})
 const formLabelWidth = '120px'
 
 const fetchUsers = async () => {
-    try {
-        const response = await fetchAllUsers()
+  try {
+    const response = await fetchAllUsers()
         users.value = response.data
     } catch (error) {
         console.error('获取用户数据失败:', error)

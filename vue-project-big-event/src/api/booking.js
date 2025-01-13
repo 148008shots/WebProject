@@ -11,3 +11,6 @@ export const creatBooking = bookingInfo => {
 export const fetchAllReservationsApi = async userId => {
     return request.get('/Booking') // 确保路径与后端匹配
 }
+export const cancelReservationApi = async reservationId => {
+    return request.patch(`/Booking/cancelBooking/${reservationId}`) // 确保路径与后端匹配
+}

@@ -1,10 +1,7 @@
 package com.hh.mapper;
 
 import com.hh.pojo.Bookings;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -26,6 +23,7 @@ public interface BookingMapper {
             "b.start_time,",
             "b.end_time,",
             "b.created_at,",
+            "b.status,",
             "b.day,",
             "b.day_of_month,",
             "b.day_of_year,",
@@ -64,4 +62,7 @@ public interface BookingMapper {
             "ORDER BY b.created_at DESC"
     })
     List<Bookings> findAllBookings();
+
+    @Update("UPDATE bookings SET status = 1 WHERE booking_id = #{reservationId}")
+    void updateBookingStatus(Integer reservationId);
 }

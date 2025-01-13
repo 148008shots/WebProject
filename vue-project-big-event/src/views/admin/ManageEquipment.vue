@@ -22,8 +22,16 @@
           </div>
           <div class="table-cell">{{ equipment.location }}</div>
           <div class="table-cell">
-            <el-button @click="editEquipment(equipment)">编辑</el-button>
-            <el-button type="danger" @click="deleteEquipment(equipment)">删除</el-button>
+            <el-button type="primary" @click="editEquipment(equipment)">
+              <el-icon>
+                <Edit/>
+              </el-icon>
+            </el-button>
+            <el-button type="danger" @click="deleteEquipment(equipment)">
+              <el-icon>
+                <Delete/>
+              </el-icon>
+            </el-button>
           </div>
         </div>
       </div>
@@ -52,17 +60,17 @@
             </el-upload>
           </el-form-item>
         </el-form>
-            <span slot="footer" class="dialog-footer">
+        <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
                 <el-button type="primary" @click="saveEquipment">确定</el-button>
             </span>
-        </el-dialog>
+      </el-dialog>
     </div>
 </template>
 
 <script setup>
 import {ref, onMounted, watch} from 'vue'
-import {Plus} from '@element-plus/icons-vue'
+import {Plus, Edit, Delete} from '@element-plus/icons-vue'
 import {
   ElTable,
   ElTableColumn,

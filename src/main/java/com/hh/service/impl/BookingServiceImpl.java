@@ -39,4 +39,9 @@ public class BookingServiceImpl implements BookingService {
     public List<Bookings> findAllBookings() {
         return bookingMapper.findAllBookings();
     }
+
+    @Override
+    public void updateBookingStatus(Integer reservationId) {
+        bookingMapper.updateBookingStatus(reservationId);
+    }
 }

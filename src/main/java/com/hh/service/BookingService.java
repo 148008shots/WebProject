@@ -12,4 +12,6 @@ public interface BookingService {
     void createBooking(Bookings booking);
 
     List<Bookings> findAllBookings();
+
+    void updateBookingStatus(Integer reservationId);
 }

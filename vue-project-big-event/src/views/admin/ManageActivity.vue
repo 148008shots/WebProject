@@ -31,13 +31,25 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="showEventDetails(scope.row)">详情</el-button>
+            <el-button type="primary" @click="showEventDetails(scope.row)">
+              <el-icon>
+                <View/>
+              </el-icon>
+            </el-button>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200">
           <template #default="scope">
-            <el-button @click="showEditDialog(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="deleteActivity(scope.row)">删除</el-button>
+            <el-button type="success" @click="showEditDialog(scope.row)">
+              <el-icon>
+                <Edit/>
+              </el-icon>
+            </el-button>
+            <el-button type="danger" @click="showDeleteDialog(scope.row)">
+              <el-icon>
+                <Delete/>
+              </el-icon>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -105,11 +117,22 @@
                 <el-button @click="detailsDialogVisible = false">关闭</el-button>
             </span>
       </el-dialog>
+      <!-- 删除确认对话框 -->
+      <el-dialog title="确认删除" v-model="deleteDialogVisible" width="30%">
+        <p>
+          确定要删除活动 <strong>{{ deleteEventName }}</strong> 吗？
+        </p>
+        <span slot="footer" class="dialog-footer">
+                <el-button @click="deleteDialogVisible = false">取消</el-button>
+                <el-button type="danger" @click="confirmDelete">确定</el-button>
+            </span>
+      </el-dialog>
     </div>
 </template>
 
 <script setup>
 import {ref, onMounted, reactive, watch} from 'vue'
+import {View, Edit, Delete} from '@element-plus/icons-vue'
 import {
   ElTable,
   ElTableColumn,
@@ -122,7 +145,8 @@ import {
   ElTag,
   ElSelect,
   ElOption,
-  ElMessage
+  ElMessage,
+  ElIcon
 } from 'element-plus'
 import {
   getActivityListService,
@@ -155,7 +179,8 @@ const pageNum = ref(1)
 const total = ref(20)
 const pageSize = ref(10)
 const eventForm = ref(null)
-
+const deleteDialogVisible = ref(false)
+const deleteEventName = ref('')
 // 状态和颜色显示函数
 const statusTextAndColor = (signUpDeadline, startTime, endTime) => {
   const now = new Date() // 获取当前时间
@@ -270,6 +295,28 @@ const deleteActivity = async event => {
     ElMessage.success('活动删除成功')
   } catch (error) {
     console.error('删除活动失败:', error)
+  }
+}
+const showDeleteDialog = event => {
+  deleteEventName.value = event.name
+  deleteDialogVisible.value = true
+}
+const confirmDelete = async () => {
+  try {
+    const event = events.value.find(e => e.name === deleteEventName.value)
+    if (event) {
+      await deleteActivityService(event.activityId)
+      const index = events.value.findIndex(e => e.activityId === event.activityId)
+      if (index !== -1) {
+        events.value.splice(index, 1) // 从列表中删除活动
+      }
+      ElMessage.success('活动删除成功')
+    }
+  } catch (error) {
+    console.error('删除活动失败:', error)
+    ElMessage.error('删除活动失败')
+  } finally {
+    deleteDialogVisible.value = false
   }
 }
 // 日期

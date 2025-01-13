@@ -9,6 +9,7 @@ public class Bookings {
     private Integer bookingId;
     private Integer userId;
     private Integer courtId;
+    private Integer status;
     private String username;
     private String startTime;
     private String endTime;
@@ -21,4 +22,5 @@ public class Bookings {
     private String location;
     private String coverImg;
     private String categoryName;
+
 }

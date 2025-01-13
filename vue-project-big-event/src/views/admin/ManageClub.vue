@@ -23,8 +23,16 @@
         <el-table-column prop="contactUserId" label="联系人" width="180"></el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
-            <el-button @click="editClub(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="deleteClub1(scope.row.clubId)">删除</el-button>
+            <el-button type="primary" @click="editClub(scope.row)">
+              <el-icon>
+                <Edit/>
+              </el-icon>
+            </el-button>
+            <el-button type="danger" @click="deleteClub1(scope.row.clubId)">
+              <el-icon>
+                <Delete/>
+              </el-icon>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -71,6 +79,7 @@
 
 <script setup>
 import {ref, onMounted, watch} from 'vue'
+import {Edit, Delete} from '@element-plus/icons-vue'
 import {ElTable, ElTableColumn, ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElSelect, ElOption} from 'element-plus'
 import {Plus} from '@element-plus/icons-vue'
 import {fetchAllClubs, addClub, deleteClub, updateClub} from '@/api/clubs'

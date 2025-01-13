@@ -36,4 +36,10 @@ public class BookingController {
         List<Bookings> bookingsList = bookingService.findAllBookings();
         return Result.success(bookingsList);
     }
+
+    @PatchMapping("/cancelBooking/{reservationId}")
+    public Result cancelReservation(@PathVariable Integer reservationId) {
+        bookingService.updateBookingStatus(reservationId);
+        return Result.success();
+    }
 }
